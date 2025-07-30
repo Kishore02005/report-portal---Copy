@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { auth, db } from "../firebaseConfig";
+import { db } from "../firebaseConfig";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
@@ -250,66 +250,7 @@ const TrendLabel = styled.div`
   font-weight: 500;
 `;
 
-const MetricsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
-`;
 
-const MetricCard = styled.div`
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e2e8f0;
-  position: relative;
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: ${props => props.accentColor};
-  }
-`;
-
-const MetricHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-`;
-
-const MetricTitle = styled.h4`
-  font-size: 1rem;
-  color: #64748b;
-  margin: 0;
-  font-weight: 500;
-`;
-
-const MetricIcon = styled.div`
-  font-size: 1.5rem;
-  opacity: 0.7;
-`;
-
-const MetricValue = styled.div`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 8px;
-`;
-
-const MetricChange = styled.div`
-  font-size: 0.85rem;
-  color: ${props => props.positive ? '#10b981' : '#ef4444'};
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-`;
 
 const SectionTitle = styled.h2`
   font-size: 1.5rem;
@@ -460,63 +401,7 @@ const OrgCountLabel = styled.div`
   letter-spacing: 0.025em;
 `;
 
-const CardGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 30px;
-`;
 
-const OrgCard = styled.div`
-  background: linear-gradient(145deg, #ffffff, #f9f9f9);
-  border-radius: 15px;
-  padding: 25px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease-in-out;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid #e2e8f0;
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-  }
-`;
-
-const OrgTitle = styled.h4`
-  margin-bottom: 15px;
-  font-size: 1.3rem;
-  color: #2c5282;
-  font-weight: 700;
-`;
-
-const Detail = styled.p`
-  font-size: 1rem;
-  margin: 8px 0;
-  color: #4a5568;
-  line-height: 1.5;
-`;
-
-const ServiceList = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-`;
-
-const ServiceItem = styled.span`
-  background-color: #e2e8f0;
-  color: #4a5568;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: 500;
-`;
-
-const NoServiceItem = styled.em`
-  color: #718096;
-  font-size: 0.9rem;
-`;
 
 const ErrorText = styled.p`
   color: #d32f2f;
@@ -525,23 +410,10 @@ const ErrorText = styled.p`
   font-size: 1rem;
 `;
 
-const LogoutButton = styled.button`
-  background-color: #f44336;
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background 0.3s;
 
-  &:hover {
-    background-color: #d32f2f;
-  }
-`;
 
 const SuperAdminDashboard = () => {
-  const [orgData, setOrgData] = useState([]);
+
   const [stats, setStats] = useState({
     totalParticipants: 0,
     hiLabParticipants: 0,
@@ -628,7 +500,7 @@ const SuperAdminDashboard = () => {
         });
 
         setCategoryStats(newCategoryStats);
-        setOrgData(result);
+
       } catch (err) {
         console.error("Error fetching data for Super Admin Dashboard:", err);
         setError("Failed to load dashboard data. Please try again.");
@@ -640,9 +512,7 @@ const SuperAdminDashboard = () => {
     fetchData();
   }, []);
 
-  const handleClick = (orgId) => {
-    navigate(`/admin/${orgId}`);
-  };
+
 
   const handleCategoryClick = (category) => {
     navigate(`/participants?category=${category}`);

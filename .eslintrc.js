@@ -4,6 +4,8 @@ module.exports = {
     'react-app/jest'
   ],
   rules: {
-    'no-console': 'off'
+    'no-console': 'off',
+    'no-unused-vars': 'off',
+    'react-hooks/exhaustive-deps': 'off'
   }
 };

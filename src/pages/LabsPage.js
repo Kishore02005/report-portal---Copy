@@ -4,7 +4,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import styled from "styled-components";
 import SuperAdminSidebar from "../components/SuperAdminSidebar";
-import Loader from "../components/Loader";
+
 
 const PageContainer = styled.div`
   display: flex;
