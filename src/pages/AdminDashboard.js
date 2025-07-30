@@ -92,14 +92,40 @@ const OverviewGrid = styled.div`
 `;
 
 const OverviewCard = styled.div`
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
   
   @media (max-width: 768px) {
-    padding: 16px;
+    padding: 20px;
   }
 `;
 
@@ -124,18 +150,45 @@ const ItemsList = styled.div`
 `;
 
 const ItemTag = styled.div`
-  background: ${props => props.type === 'lab' ? '#ecfdf5' : '#eff6ff'};
+  background: ${props => props.type === 'lab' 
+    ? 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)' 
+    : 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)'};
   color: ${props => props.type === 'lab' ? '#166534' : '#1d4ed8'};
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
   font-size: 0.9rem;
-  font-weight: 500;
-  border: 1px solid ${props => props.type === 'lab' ? '#bbf7d0' : '#bfdbfe'};
+  font-weight: 600;
+  border: 1px solid ${props => props.type === 'lab' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(59, 130, 246, 0.2)'};
   word-break: break-word;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: ${props => props.type === 'lab' 
+      ? 'linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.1), transparent)'
+      : 'linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent)'};
+    transition: left 0.5s ease;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px ${props => props.type === 'lab' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(59, 130, 246, 0.2)'};
+    
+    &::before {
+      left: 100%;
+    }
+  }
   
   @media (max-width: 768px) {
     font-size: 0.85rem;
-    padding: 6px 10px;
+    padding: 8px 12px;
   }
 `;
 
@@ -147,37 +200,68 @@ const EmptyMessage = styled.div`
 
 const StatCard = styled.div`
   flex: 1 1 200px;
-  background: #f0f4ff;
-  border-radius: 12px;
-  padding: 20px;
+  background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
+  border-radius: 16px;
+  padding: 24px;
   text-align: center;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.1), 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(59, 130, 246, 0.1);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+    transition: left 0.6s ease;
+  }
 
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(59, 130, 246, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    color: white;
+    
+    &::before {
+      left: 100%;
+    }
   }
   
   @media (max-width: 768px) {
-    padding: 16px;
+    padding: 20px;
   }
   
   @media (max-width: 480px) {
     flex: 1 1 auto;
+    padding: 16px;
   }
 `;
 
 const StatValue = styled.h3`
-  font-size: 28px;
-  color: #3f51b5;
-  margin: 10px 0;
-  font-weight: 700;
+  font-size: 32px;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 12px 0;
+  font-weight: 800;
+  transition: all 0.3s ease;
+  
+  ${StatCard}:hover & {
+    color: white;
+    -webkit-text-fill-color: white;
+    transform: scale(1.1);
+  }
 `;
 
 const StatLabel = styled.p`
@@ -197,31 +281,51 @@ const ParticipantList = styled.ul`
 `;
 
 const ParticipantItem = styled.li`
-  padding: 14px 18px;
-  background: #fff;
-  border-radius: 10px;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
   margin-bottom: 12px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  transition: transform 0.2s, background 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 1rem;
   color: #333;
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.05), transparent);
+    transition: left 0.6s ease;
+  }
 
   &:hover {
-    transform: scale(1.015);
-    background: #f9faff;
+    transform: translateY(-4px) scale(1.02);
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1);
+    
+    &::before {
+      left: 100%;
+    }
   }
   
   @media (max-width: 768px) {
-    padding: 12px 14px;
+    padding: 16px;
     margin-bottom: 10px;
     font-size: 0.95rem;
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 12px;
   }
 `;
 
@@ -235,22 +339,46 @@ const ParticipantName = styled.span`
 `;
 
 const ViewDetailsButton = styled.button`
-  background-color: #5c6bc0;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   color: white;
   border: none;
-  padding: 8px 15px;
-  border-radius: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
   cursor: pointer;
   font-size: 0.9rem;
-  transition: background 0.3s;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+  }
 
   &:hover {
-    background-color: #3f51b5;
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+    
+    &::before {
+      left: 100%;
+    }
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
   
   @media (max-width: 768px) {
     width: 100%;
-    padding: 8px 12px;
+    padding: 10px 16px;
   }
 `;
 
@@ -332,8 +460,12 @@ const AdminDashboard = () => {
           setError("Organization details not found.");
         }
 
-        // 2. Fetch Participants for this Organization from the 'Users' collection
-        const q = query(collection(db, "Users"), where("organizationId", "==", organizationId));
+        // 2. Fetch Participants for this Organization from the 'Users' collection (only users with role 'user')
+        const q = query(
+          collection(db, "Users"), 
+          where("organizationId", "==", organizationId),
+          where("role", "==", "user")
+        );
         const snapshot = await getDocs(q);
         const results = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setParticipants(results);

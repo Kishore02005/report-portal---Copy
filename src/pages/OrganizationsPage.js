@@ -12,10 +12,23 @@ const PageContainer = styled.div`
 
 const ContentWrapper = styled.div`
   flex: 1;
-  padding: 48px;
   margin-left: 300px;
-  max-width: 1400px;
-  margin-right: auto;
+  padding: 48px;
+  width: calc(100% - 300px);
+  box-sizing: border-box;
+  
+  @media (max-width: 1024px) {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+    padding: 32px;
+  }
+  
+  @media (max-width: 768px) {
+    margin-left: 0;
+    width: 100%;
+    padding: 20px;
+    padding-top: 80px;
+  }
 `;
 
 const Header = styled.div`

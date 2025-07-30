@@ -5,6 +5,7 @@ import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import { useAuth } from "../context/AuthContext";
+import useResponsive from "../hooks/useResponsive";
 import logo from "../assets/Aaruchudar Final Logo (1).png";
 
 const SidebarContainer = styled.div`
@@ -237,6 +238,7 @@ const SuperAdminSidebar = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isMobile } = useResponsive();
   const [isOpen, setIsOpen] = useState(false);
 
   // Close sidebar when route changes on mobile
@@ -288,23 +290,23 @@ const SuperAdminSidebar = () => {
       <Navigation>
         <NavSection>
           <NavTitle>Super Admin Panel</NavTitle>
-          <SidebarLink to="/superadmin">
+          <SidebarLink to="/superadmin" onClick={() => isMobile && setIsOpen(false)}>
             <IconWrapper>■</IconWrapper>
             Dashboard
           </SidebarLink>
-          <SidebarLink to="/organizations">
+          <SidebarLink to="/organizations" onClick={() => isMobile && setIsOpen(false)}>
             <IconWrapper>◆</IconWrapper>
             Organizations
           </SidebarLink>
-          <SidebarLink to="/labs">
+          <SidebarLink to="/labs" onClick={() => isMobile && setIsOpen(false)}>
             <IconWrapper>▲</IconWrapper>
             HI Labs
           </SidebarLink>
-          <SidebarLink to="/courses">
+          <SidebarLink to="/courses" onClick={() => isMobile && setIsOpen(false)}>
             <IconWrapper>●</IconWrapper>
             Courses
           </SidebarLink>
-          <SidebarLink to="/reports">
+          <SidebarLink to="/reports" onClick={() => isMobile && setIsOpen(false)}>
             <IconWrapper>▬</IconWrapper>
             Reports
           </SidebarLink>

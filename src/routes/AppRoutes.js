@@ -14,6 +14,8 @@ import OrganizationsPage from "../pages/OrganizationsPage";
 import OrganizationCategoryPage from "../pages/OrganizationCategoryPage";
 import LabsPage from "../pages/LabsPage";
 import CoursesPage from "../pages/CoursesPage";
+import CourseDetailPage from "../pages/CourseDetailPage";
+import LabDetailPage from "../pages/LabDetailPage";
 import ReportsPage from "../pages/ReportsPage";
 
 // New placeholder pages for user-specific courses/labs
@@ -44,13 +46,16 @@ const AppRoutes = () => {
       <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboard /></ProtectedRoute>} />
       <Route path="/participants" element={<ProtectedRoute allowedRoles={["admin", "superadmin"]}><ParticipantsPage /></ProtectedRoute>} />
       <Route path="/participants/:participantId" element={<ProtectedRoute allowedRoles={["admin", "superadmin"]}><ParticipantDetails /></ProtectedRoute>} />
+      <Route path="/achievements/:userEmail" element={<ProtectedRoute allowedRoles={["admin", "superadmin"]}><AchievementPage /></ProtectedRoute>} />
 
       {/* Super Admin Routes */}
       <Route path="/superadmin" element={<ProtectedRoute allowedRoles={["superadmin"]}><SuperAdminDashboard /></ProtectedRoute>} />
       <Route path="/organizations" element={<ProtectedRoute allowedRoles={["superadmin"]}><OrganizationsPage /></ProtectedRoute>} />
       <Route path="/organizations/:category" element={<ProtectedRoute allowedRoles={["superadmin"]}><OrganizationCategoryPage /></ProtectedRoute>} />
       <Route path="/labs" element={<ProtectedRoute allowedRoles={["superadmin"]}><LabsPage /></ProtectedRoute>} />
+      <Route path="/labs/:labId" element={<ProtectedRoute allowedRoles={["superadmin"]}><LabDetailPage /></ProtectedRoute>} />
       <Route path="/courses" element={<ProtectedRoute allowedRoles={["superadmin"]}><CoursesPage /></ProtectedRoute>} />
+      <Route path="/courses/:courseId" element={<ProtectedRoute allowedRoles={["superadmin"]}><CourseDetailPage /></ProtectedRoute>} />
       <Route path="/reports" element={<ProtectedRoute allowedRoles={["superadmin"]}><ReportsPage /></ProtectedRoute>} />
 
       {/* Catch-all for 404 */}

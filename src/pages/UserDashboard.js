@@ -12,111 +12,45 @@ const fadeIn = keyframes`
   100% { opacity: 1; transform: translateY(0); }
 `;
 
-const float = keyframes`
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(180deg); }
-  100% { transform: translateY(0px) rotate(360deg); }
-`;
-
-const gradientShift = keyframes`
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-`;
-
 /* -------------------- STYLED COMPONENTS -------------------- */
 const PageContainer = styled.div`
   min-height: 100vh;
   background: #f8fafc;
-  font-family: "Inter", "Segoe UI", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   display: flex;
   flex-direction: column;
 `;
 
 const ContentWrapper = styled.div`
   flex: 1;
-  padding: 20px 24px;
-  padding-top: 84px;
+  padding: 1.25rem 1.5rem;
+  padding-top: 5.25rem;
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
-  min-height: calc(100vh - 84px);
+  min-height: calc(100vh - 5.25rem);
   display: flex;
   flex-direction: column;
+  
+  @media (max-width: 1024px) {
+    padding: 1rem 1.25rem;
+    padding-top: 5rem;
+    max-width: 1200px;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 1rem;
+    padding-top: 4.5rem;
+    max-width: 100%;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 0.75rem;
+    padding-top: 4rem;
+  }
 `;
 
-const FloatingElement = styled.div`
-  position: absolute;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  animation: ${float} 25s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 1;
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  
-  &.element-1 {
-    width: 120px;
-    height: 120px;
-    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-    top: 8%;
-    left: 8%;
-    animation-delay: 0s;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.1) 100%);
-  }
-  
-  &.element-2 {
-    width: 180px;
-    height: 180px;
-    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-    top: 55%;
-    right: 10%;
-    animation-delay: -8s;
-    background: linear-gradient(135deg, rgba(240, 147, 251, 0.2) 0%, rgba(245, 87, 108, 0.1) 100%);
-  }
-  
-  &.element-3 {
-    width: 90px;
-    height: 90px;
-    border-radius: 40% 60% 60% 40% / 60% 40% 60% 40%;
-    bottom: 15%;
-    left: 15%;
-    animation-delay: -15s;
-    background: linear-gradient(135deg, rgba(79, 172, 254, 0.2) 0%, rgba(102, 126, 234, 0.1) 100%);
-  }
-  
-  &.element-4 {
-    width: 140px;
-    height: 140px;
-    border-radius: 70% 30% 50% 50% / 30% 60% 40% 70%;
-    top: 25%;
-    right: 25%;
-    animation-delay: -20s;
-    background: linear-gradient(135deg, rgba(255, 182, 193, 0.2) 0%, rgba(240, 147, 251, 0.1) 100%);
-  }
-  
-  &.element-5 {
-    width: 70px;
-    height: 70px;
-    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-    top: 70%;
-    left: 60%;
-    animation-delay: -12s;
-    background: linear-gradient(135deg, rgba(78, 205, 196, 0.2) 0%, rgba(79, 172, 254, 0.1) 100%);
-  }
-  
-  &.element-6 {
-    width: 110px;
-    height: 110px;
-    border-radius: 30% 70% 40% 60% / 40% 50% 60% 50%;
-    bottom: 40%;
-    right: 50%;
-    animation-delay: -25s;
-    background: linear-gradient(135deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 182, 193, 0.1) 100%);
-  }
-`;
+
 
 
 
@@ -144,6 +78,11 @@ const DashboardGrid = styled.div`
   flex: 1;
   align-items: start;
   
+  @media (max-width: 1200px) {
+    grid-template-columns: 280px 1fr;
+    gap: 16px;
+  }
+  
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
     gap: 16px;
@@ -153,10 +92,20 @@ const DashboardGrid = styled.div`
 const Card = styled.div`
   background: white;
   border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid #e2e8f0;
   animation: ${fadeIn} 0.6s ease;
+  
+  @media (max-width: 768px) {
+    padding: 1.25rem;
+    border-radius: 10px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 1rem;
+    border-radius: 8px;
+  }
 `;
 
 const ProfileCard = styled(Card)`
@@ -201,21 +150,43 @@ const StatsGrid = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   width: 100%;
+  
+  @media (max-width: 480px) {
+    gap: 8px;
+  }
 `;
 
 const StatItem = styled.div`
   background: #f8fafc;
-  padding: 12px;
+  padding: 1rem 0.75rem;
   border-radius: 8px;
   text-align: center;
   border: 1px solid #e2e8f0;
+  
+  @media (max-width: 768px) {
+    padding: 0.875rem 0.625rem;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 0.75rem 0.5rem;
+    border-radius: 6px;
+  }
 `;
 
 const StatValue = styled.div`
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 4px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #3b82f6;
+  margin-bottom: 0.25rem;
+  line-height: 1;
+  
+  @media (max-width: 768px) {
+    font-size: 1.625rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1.5rem;
+  }
 `;
 
 const StatLabel = styled.div`
@@ -292,7 +263,7 @@ const Progress = styled.div`
   height: 100%;
   background: #3b82f6;
   width: ${({ $percent }) => $percent || 0}%;
-  transition: width 0.8s ease;
+  transition: width 1.2s ease;
   border-radius: 4px;
 `;
 
@@ -318,12 +289,25 @@ const Iframe = styled.iframe`
   border: none;
   border-radius: 8px;
   border: 1px solid #e2e8f0;
+  
+  @media (max-width: 768px) {
+    height: 300px;
+  }
+  
+  @media (max-width: 480px) {
+    height: 250px;
+  }
 `;
 
 const ActionButtons = styled.div`
   display: flex;
   gap: 12px;
   margin-top: 16px;
+  
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 8px;
+  }
 `;
 
 const Button = styled.a`
@@ -357,17 +341,34 @@ const SecondaryButton = styled(Button)`
   border: 1px solid #e2e8f0;
   
   &:hover {
-    background: #f1f5f9;
+    background: #eff6ff;
     text-decoration: none;
-    color: #475569;
+    color: #3b82f6;
+    border-color: #3b82f6;
   }
 `;
 
 const ErrorText = styled.p`
-  color: #d32f2f;
+  color: #dc2626;
   text-align: center;
-  margin-top: 30px;
+  margin-top: 2rem;
   font-size: 1rem;
+  background: #fef2f2;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+  line-height: 1.5;
+  
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+    padding: 1rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.875rem;
+    margin-top: 1.5rem;
+    border-radius: 6px;
+  }
 `;
 
 /* -------------------- MAIN COMPONENT -------------------- */

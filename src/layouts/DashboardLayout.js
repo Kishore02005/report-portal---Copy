@@ -10,18 +10,36 @@
       min-height: 100vh;
       background: #f8f9fc;
       font-family: "Poppins", sans-serif;
-      border: 5px solid purple;
+      
+      @media (max-width: 768px) {
+        flex-direction: column;
+      }
     `;
 
     const Content = styled.div`
       flex: 1;
       padding: 20px 30px;
-      margin-left: ${({ hasSidebar }) => (hasSidebar ? "250px" : "0")};
+      margin-left: ${({ hasSidebar }) => (hasSidebar ? "280px" : "0")};
       transition: margin-left 0.3s ease-in-out;
       padding-top: ${({ hasSidebar }) => (hasSidebar ? "20px" : "70px")}; 
       box-sizing: border-box;
       position: relative; 
-      z-index: 1; 
+      z-index: 1;
+      
+      @media (max-width: 1024px) {
+        padding: 16px 20px;
+        margin-left: ${({ hasSidebar }) => (hasSidebar ? "250px" : "0")};
+      }
+      
+      @media (max-width: 768px) {
+        margin-left: 0;
+        padding: 16px;
+        padding-top: ${({ hasSidebar }) => (hasSidebar ? "76px" : "76px")};
+      }
+      
+      @media (max-width: 480px) {
+        padding: 12px;
+      }
     `;
 
     const DashboardLayout = ({ children }) => {

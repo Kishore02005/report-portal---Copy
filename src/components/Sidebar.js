@@ -8,7 +8,7 @@
     const SidebarContainer = styled.div`
       width: 250px;
       height: 100vh;
-      background-color: #2e3a59; /* Your original background color */
+      background-color: #2e3a59;
       color: white;
       display: flex;
       flex-direction: column;
@@ -18,9 +18,14 @@
       top: 0;
       left: 0;
       box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-      z-index: 1000; /* Keep this high */
-      /* Remove temporary debug border */
-      /* border: 2px solid yellow; */
+      z-index: 1000;
+      transition: transform 0.3s ease;
+      
+      @media (max-width: 768px) {
+        width: 280px;
+        transform: ${props => props.$isOpen ? 'translateX(0)' : 'translateX(-100%)'};
+        padding: 20px;
+      }
     `;
 
     const Logo = styled(Link)`
@@ -101,9 +106,58 @@
       }
     `;
 
+    const MobileHeader = styled.div`
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: #2e3a59;
+      z-index: 999;
+      padding: 0 16px;
+      align-items: center;
+      justify-content: space-between;
+      
+      @media (max-width: 768px) {
+        display: flex;
+      }
+    `;
+
+    const MobileMenuButton = styled.button`
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: white;
+      cursor: pointer;
+      padding: 8px;
+    `;
+
+    const MobileBrand = styled.div`
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 600;
+    `;
+
+    const Overlay = styled.div`
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 998;
+      
+      @media (max-width: 768px) {
+        display: ${props => props.$isOpen ? 'block' : 'none'};
+      }
+    `;
+
     const Sidebar = () => {
       const { user, role } = useAuth();
       const navigate = useNavigate();
+      const [isOpen, setIsOpen] = React.useState(false);
 
       console.log("Sidebar: user =", user);
       console.log("Sidebar: role =", role);
@@ -133,7 +187,20 @@
       }
 
       return (
-        <SidebarContainer>
+        <>
+          <MobileHeader>
+            <MobileMenuButton onClick={() => setIsOpen(!isOpen)}>
+              ☰
+            </MobileMenuButton>
+            <MobileBrand>
+              HI {role === "superadmin" ? "SuperAdmin" : "Admin"}
+            </MobileBrand>
+            <div style={{ width: '24px' }}></div>
+          </MobileHeader>
+          
+          <Overlay $isOpen={isOpen} onClick={() => setIsOpen(false)} />
+          
+        <SidebarContainer $isOpen={isOpen}>
           <Logo to={logoDashboardLink}>
             HI {role === "superadmin" ? "SuperAdmin" : "Admin"}
           </Logo>
@@ -159,6 +226,7 @@
             </UsernameContainer>
           </ProfileSection>
         </SidebarContainer>
+        </>
       );
     };
 

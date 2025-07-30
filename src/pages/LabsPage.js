@@ -15,10 +15,23 @@ const PageContainer = styled.div`
 
 const ContentWrapper = styled.div`
   flex: 1;
-  padding: 32px;
   margin-left: 300px;
-  max-width: 1400px;
-  margin-right: auto;
+  padding: 32px;
+  width: calc(100% - 300px);
+  box-sizing: border-box;
+  
+  @media (max-width: 1024px) {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+    padding: 24px;
+  }
+  
+  @media (max-width: 768px) {
+    margin-left: 0;
+    width: 100%;
+    padding: 20px;
+    padding-top: 80px;
+  }
 `;
 
 const Header = styled.div`
@@ -40,20 +53,28 @@ const Subtitle = styled.p`
 
 const LabsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 28px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 `;
 
 const LabCard = styled.div`
-  background: ${props => props.bgGradient || 'white'};
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   border: 1px solid #e2e8f0;
   transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
   
   &::before {
     content: '';
@@ -62,8 +83,20 @@ const LabCard = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.9);
+    background: ${props => props.bgGradient || 'white'};
+    opacity: 0.1;
     z-index: 1;
+  }
+  
+  &::after {
+    content: '${props => props.icon || ''}';
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    font-size: 2rem;
+    opacity: 0.15;
+    z-index: 1;
+    color: #64748b;
   }
   
   & > * {
@@ -72,51 +105,61 @@ const LabCard = styled.div`
   }
   
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
     border-color: #10b981;
     
     &::before {
-      background: rgba(255, 255, 255, 0.85);
+      opacity: 0.15;
+    }
+    
+    &::after {
+      opacity: 0.3;
+      transform: scale(1.05);
+      color: #10b981;
     }
   }
 `;
 
 const LabHeader = styled.div`
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  padding-right: 60px;
 `;
 
 const LabTitle = styled.h3`
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   color: #1e293b;
-  font-weight: 600;
-  margin: 0 0 8px 0;
-  line-height: 1.4;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  line-height: 1.3;
 `;
 
 const LabBadge = styled.div`
-  display: inline-block;
-  background: #ecfdf5;
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
   color: #10b981;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid rgba(16, 185, 129, 0.1);
 `;
 
 const LabDescription = styled.p`
   color: #64748b;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  margin: 12px 0 0 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
 `;
 
 const LabStats = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 16px;
-  padding-top: 16px;
+  margin-top: 20px;
+  padding-top: 20px;
   border-top: 1px solid #f1f5f9;
 `;
 
@@ -127,35 +170,42 @@ const EnrollmentCount = styled.div`
   color: #10b981;
   font-weight: 600;
   font-size: 0.9rem;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 6px 12px;
+  border-radius: 12px;
 `;
 
 const LabFooter = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 12px;
+  margin-top: 16px;
 `;
 
 const LabType = styled.div`
-  background: #f0fdf4;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
   color: #166534;
-  padding: 4px 12px;
-  border-radius: 12px;
+  padding: 6px 14px;
+  border-radius: 16px;
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 600;
+  border: 1px solid rgba(22, 101, 52, 0.1);
 `;
 
 const ViewButton = styled.div`
-  background: #10b981;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
-  padding: 8px 16px;
-  border-radius: 6px;
+  padding: 10px 18px;
+  border-radius: 10px;
   font-size: 0.85rem;
-  font-weight: 500;
-  transition: background 0.2s ease;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
   
   &:hover {
-    background: #059669;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
   }
 `;
 
@@ -165,71 +215,193 @@ const Modal = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(8px);
+  animation: modalFadeIn 0.3s ease-out;
+  
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      backdrop-filter: blur(0px);
+    }
+    to {
+      opacity: 1;
+      backdrop-filter: blur(8px);
+    }
+  }
 `;
 
 const ModalContent = styled.div`
-  background: white;
-  border-radius: 12px;
-  padding: 32px;
-  max-width: 600px;
+  background: ${props => props.bgGradient || 'white'};
+  border-radius: 20px;
+  padding: 0;
+  max-width: 700px;
   width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
+  max-height: 85vh;
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  position: relative;
+  animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: ${props => props.bgPattern || 'rgba(255, 255, 255, 0.95)'};
+    z-index: 1;
+  }
+  
+  &::after {
+    content: '${props => props.icon || ''}';
+    position: absolute;
+    top: 30px;
+    right: 80px;
+    font-size: 4rem;
+    opacity: 0.1;
+    z-index: 1;
+  }
+  
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: scale(0.8) translateY(50px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
 `;
 
 const ModalHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 32px 32px 0 32px;
   margin-bottom: 24px;
+  position: relative;
+  z-index: 2;
 `;
 
 const ModalTitle = styled.h2`
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   color: #1e293b;
-  font-weight: 600;
+  font-weight: 700;
   margin: 0;
+  max-width: 80%;
+  line-height: 1.3;
+  animation: titleSlideIn 0.6s ease-out 0.2s both;
+  
+  @keyframes titleSlideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
 `;
 
 const CloseButton = styled.button`
-  background: none;
+  background: rgba(255, 255, 255, 0.9);
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   cursor: pointer;
   color: #64748b;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   
   &:hover {
-    color: #1e293b;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    transform: scale(1.1);
   }
 `;
 
 const ParticipantsList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+  padding: 0 32px 32px 32px;
+  position: relative;
+  z-index: 2;
+  max-height: 60vh;
+  overflow-y: auto;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(16, 185, 129, 0.3);
+    border-radius: 3px;
+  }
 `;
 
 const ParticipantItem = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  gap: 16px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  animation: participantSlideIn 0.5s ease-out;
+  animation-delay: ${props => (props.index || 0) * 0.1}s;
+  animation-fill-mode: both;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  @keyframes participantSlideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
 `;
 
 const ParticipantAvatar = styled.img`
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #f1f5f9;
+  border: 3px solid rgba(16, 185, 129, 0.2);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    border-color: rgba(16, 185, 129, 0.5);
+    transform: scale(1.1);
+  }
 `;
 
 const ParticipantInfo = styled.div`
@@ -237,20 +409,32 @@ const ParticipantInfo = styled.div`
 `;
 
 const ParticipantName = styled.div`
-  font-weight: 600;
+  font-weight: 700;
   color: #1e293b;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
+  font-size: 1.1rem;
 `;
 
 const ParticipantEmail = styled.div`
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: #64748b;
+  font-weight: 500;
 `;
 
 const EmptyState = styled.div`
   text-align: center;
-  padding: 32px;
+  padding: 60px 32px;
   color: #64748b;
+  position: relative;
+  z-index: 2;
+  
+  &::before {
+    content: '🔬';
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 16px;
+    opacity: 0.3;
+  }
 `;
 
 const LabsPage = () => {
@@ -345,8 +529,7 @@ const LabsPage = () => {
   };
 
   const handleLabClick = (lab) => {
-    setSelectedLab(lab);
-    fetchParticipants(lab.title);
+    navigate(`/labs/${lab.id}`);
   };
 
   const closeModal = () => {
@@ -383,6 +566,36 @@ const LabsPage = () => {
     
     return backgrounds[title] || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
   };
+  
+  const getLabPattern = (title) => {
+    const patterns = {
+      "Clarity as Culture": "radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.2) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.1) 0%, transparent 50%), rgba(255, 255, 255, 0.9)",
+      "Decision-Making Without Drama": "radial-gradient(circle at 30% 70%, rgba(240, 147, 251, 0.3) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(245, 87, 108, 0.2) 0%, transparent 50%), rgba(255, 255, 255, 0.9)",
+      "Inner Focus in Noisy Worlds": "radial-gradient(circle at 25% 75%, rgba(79, 172, 254, 0.3) 0%, transparent 50%), radial-gradient(circle at 75% 25%, rgba(0, 242, 254, 0.2) 0%, transparent 50%), rgba(255, 255, 255, 0.9)",
+      "The Power of Listening": "radial-gradient(circle at 35% 65%, rgba(67, 233, 123, 0.3) 0%, transparent 50%), radial-gradient(circle at 65% 35%, rgba(56, 249, 215, 0.2) 0%, transparent 50%), rgba(255, 255, 255, 0.9)",
+      "Intelligent Conflict and Recovery": "radial-gradient(circle at 40% 60%, rgba(250, 112, 154, 0.3) 0%, transparent 50%), radial-gradient(circle at 60% 40%, rgba(254, 225, 64, 0.2) 0%, transparent 50%), rgba(255, 255, 255, 0.9)",
+      "Systemic Thinking": "radial-gradient(circle at 45% 55%, rgba(168, 237, 234, 0.3) 0%, transparent 50%), radial-gradient(circle at 55% 45%, rgba(254, 214, 227, 0.2) 0%, transparent 50%), rgba(255, 255, 255, 0.9)",
+      "Voice, Value and Vulnerability": "radial-gradient(circle at 50% 50%, rgba(255, 154, 158, 0.3) 0%, transparent 50%), radial-gradient(circle at 30% 70%, rgba(254, 207, 239, 0.2) 0%, transparent 50%), rgba(255, 255, 255, 0.9)",
+      "Leadership Without Imitation": "radial-gradient(circle at 60% 40%, rgba(255, 236, 210, 0.3) 0%, transparent 50%), radial-gradient(circle at 40% 60%, rgba(252, 182, 159, 0.2) 0%, transparent 50%), rgba(255, 255, 255, 0.9)"
+    };
+    
+    return patterns[title] || "rgba(255, 255, 255, 0.9)";
+  };
+  
+  const getLabIcon = (title) => {
+    const icons = {
+      "Clarity as Culture": "🏛️",
+      "Decision-Making Without Drama": "⚖️",
+      "Inner Focus in Noisy Worlds": "🧘",
+      "The Power of Listening": "👂",
+      "Intelligent Conflict and Recovery": "🤝",
+      "Systemic Thinking": "🔄",
+      "Voice, Value and Vulnerability": "🎤",
+      "Leadership Without Imitation": "👑"
+    };
+    
+    return icons[title] || "🔬";
+  };
 
   const getEnrolledCount = (labTitle) => {
     return allUsers.filter(user => 
@@ -401,7 +614,14 @@ const LabsPage = () => {
         
         <LabsGrid>
           {labs.map((lab) => (
-            <LabCard key={lab.id} onClick={() => handleLabClick(lab)} bgGradient={getLabBackground(lab.title)}>
+            <LabCard 
+              key={lab.id} 
+              onClick={() => handleLabClick(lab)} 
+              bgGradient={getLabBackground(lab.title)}
+              bgPattern={getLabPattern(lab.title)}
+              hoverBgPattern={getLabPattern(lab.title).replace('0.9)', '0.85)')}
+              icon={getLabIcon(lab.title)}
+            >
               <LabHeader>
                 <LabTitle>{lab.title}</LabTitle>
                 <LabBadge>Lab Experience</LabBadge>
@@ -413,7 +633,7 @@ const LabsPage = () => {
               
               <LabStats>
                 <EnrollmentCount>
-                  👥 {getEnrolledCount(lab.title)} Enrolled
+                  <span>👥</span> {getEnrolledCount(lab.title)} Enrolled
                 </EnrollmentCount>
               </LabStats>
               
@@ -425,41 +645,7 @@ const LabsPage = () => {
           ))}
         </LabsGrid>
         
-        {selectedLab && (
-          <Modal onClick={closeModal}>
-            <ModalContent onClick={(e) => e.stopPropagation()}>
-              <ModalHeader>
-                <ModalTitle>{selectedLab.title}</ModalTitle>
-                <CloseButton onClick={closeModal}>×</CloseButton>
-              </ModalHeader>
-              
-              {loading ? (
-                <Loader />
-              ) : participants.length > 0 ? (
-                <ParticipantsList>
-                  {participants.map((participant) => (
-                    <ParticipantItem key={participant.id}>
-                      <ParticipantAvatar 
-                        src={participant.photoURL || "https://i.pravatar.cc/150"}
-                        alt={participant.username || participant.email}
-                      />
-                      <ParticipantInfo>
-                        <ParticipantName>
-                          {participant.username || participant.email?.split('@')[0] || 'Unknown User'}
-                        </ParticipantName>
-                        <ParticipantEmail>{participant.email}</ParticipantEmail>
-                      </ParticipantInfo>
-                    </ParticipantItem>
-                  ))}
-                </ParticipantsList>
-              ) : (
-                <EmptyState>
-                  <p>No participants enrolled in this lab yet.</p>
-                </EmptyState>
-              )}
-            </ModalContent>
-          </Modal>
-        )}
+
       </ContentWrapper>
     </PageContainer>
   );

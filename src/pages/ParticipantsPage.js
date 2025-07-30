@@ -3,47 +3,141 @@ import styled from "styled-components";
 import { db } from "../firebaseConfig";
 import { collection, getDocs, query, where, doc, getDoc } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Loader from "../components/Loader";
 import AdminSidebar from "../components/AdminSidebar";
 
 const PageContainer = styled.div`
   display: flex;
   min-height: 100vh;
-  background: #f8fafc;
-  font-family: "Inter", "Segoe UI", sans-serif;
+  width: 100vw;
+  background-image: url('${props => props.backgroundImage}');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  
+  * {
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+  
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
 `;
 
 const ContentWrapper = styled.div`
   flex: 1;
   margin-left: 280px;
   padding: 32px;
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  overflow-y: auto;
+  
+  @media (max-width: 1024px) {
+    margin-left: 250px;
+    padding: 24px;
+  }
+  
+  @media (max-width: 768px) {
+    margin-left: 0;
+    padding: 16px;
+    padding-top: 76px;
+  }
 `;
 
 const Header = styled.div`
   margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`;
+
+const BackButton = styled.button`
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #1e293b;
+  backdrop-filter: blur(10px);
+  
+  &:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #3b82f6;
+    transform: translateX(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+`;
+
+const HeaderContent = styled.div`
+  flex: 1;
 `;
 
 const PageTitle = styled.h1`
   font-size: 2rem;
-  font-weight: 600;
-  color: #1e293b;
+  font-weight: 700;
+  color: white;
   margin: 0 0 8px 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  font-family: 'Poppins', 'Inter', sans-serif;
 `;
 
 const PageSubtitle = styled.p`
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 1rem;
   margin: 0;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+  font-weight: 500;
 `;
 
 const FiltersSection = styled.div`
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
 `;
 
 const FilterRow = styled.div`
@@ -51,37 +145,85 @@ const FilterRow = styled.div`
   gap: 16px;
   align-items: center;
   flex-wrap: wrap;
+  
+  @media (max-width: 768px) {
+    gap: 12px;
+  }
+  
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 `;
 
 const SearchInput = styled.input`
   flex: 1;
   min-width: 300px;
-  padding: 10px 16px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  padding: 12px 18px;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 12px;
   font-size: 0.9rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  transition: all 0.3s ease;
   
   &:focus {
     outline: none;
     border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1), 0 4px 12px rgba(59, 130, 246, 0.15);
+    background: #ffffff;
+    transform: translateY(-2px);
+  }
+  
+  &::placeholder {
+    color: #94a3b8;
+  }
+  
+  @media (max-width: 768px) {
+    min-width: 200px;
+    width: 100%;
+    padding: 10px 16px;
   }
 `;
 
 const FilterButton = styled.button`
-  padding: 10px 16px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: ${props => props.active ? '#3b82f6' : 'white'};
+  padding: 12px 20px;
+  border: 1px solid ${props => props.active ? 'transparent' : 'rgba(59, 130, 246, 0.2)'};
+  border-radius: 12px;
+  background: ${props => props.active 
+    ? 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)' 
+    : 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)'};
   color: ${props => props.active ? 'white' : '#64748b'};
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: ${props => props.active 
+      ? 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent)'
+      : 'linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent)'};
+    transition: left 0.5s ease;
+  }
   
   &:hover {
-    background: ${props => props.active ? '#2563eb' : '#f8fafc'};
-    border-color: ${props => props.active ? '#2563eb' : '#cbd5e1'};
+    background: ${props => props.active 
+      ? 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)' 
+      : 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)'};
+    color: ${props => props.active ? 'white' : '#3b82f6'};
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    
+    &::before {
+      left: 100%;
+    }
   }
 `;
 
@@ -90,42 +232,122 @@ const StatsCards = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
   margin-bottom: 24px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 `;
 
 const StatCard = styled.div`
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.1);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+    transition: left 0.6s ease;
+  }
   
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 12px 32px rgba(59, 130, 246, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    color: white;
+    
+    &::before {
+      left: 100%;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    padding: 24px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 20px;
   }
 `;
 
 const StatValue = styled.div`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1e293b;
+  font-size: 2.5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 8px;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', 'Inter', sans-serif;
+  
+  ${StatCard}:hover & {
+    color: white;
+    -webkit-text-fill-color: white;
+    transform: scale(1.1);
+  }
 `;
 
 const StatLabel = styled.div`
   font-size: 0.9rem;
   color: #64748b;
-  font-weight: 500;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
 `;
 
 const ParticipantsTable = styled.div`
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.1);
   overflow: hidden;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  
+  @media (max-width: 768px) {
+    background: transparent;
+    backdrop-filter: none;
+    box-shadow: none;
+    border: none;
+    
+    &::before {
+      display: none;
+    }
+  }
 `;
 
 const TableHeader = styled.div`
@@ -140,6 +362,19 @@ const TableHeader = styled.div`
   color: #374151;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr 150px 100px 80px;
+    padding: 12px 16px;
+    
+    div:nth-child(3) {
+      display: none;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const TableRow = styled.div`
@@ -158,14 +393,42 @@ const TableRow = styled.div`
   &:last-child {
     border-bottom: none;
   }
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr 150px 100px 80px;
+    padding: 12px 16px;
+    
+    div:nth-child(3) {
+      display: none;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    display: block;
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    
+    .desktop-only {
+      display: none;
+    }
+    
+    .mobile-only {
+      display: block !important;
+    }
+  }
 `;
 
 const ParticipantName = styled.div`
-  font-weight: 600;
+  font-weight: 700;
   color: #1e293b;
   display: flex;
   align-items: center;
   gap: 12px;
+  font-family: 'Poppins', 'Inter', sans-serif;
 `;
 
 const Avatar = styled.img`
@@ -194,18 +457,37 @@ const Badge = styled.span`
 `;
 
 const ViewButton = styled.button`
-  padding: 6px 12px;
-  background: #3b82f6;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+  }
   
   &:hover {
-    background: #2563eb;
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    
+    &::before {
+      left: 100%;
+    }
   }
 `;
 
@@ -226,6 +508,24 @@ const ParticipantsPage = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { organizationId: paramOrgId } = useParams();
+  const [searchParams] = useSearchParams();
+  const categoryFilter = searchParams.get('category');
+  const courseFilter = searchParams.get('course');
+  const courseTitle = searchParams.get('title');
+
+  const getCourseBackgroundImage = (title) => {
+    const backgrounds = {
+      "Empowering Human Intelligence – 7-Day Online Course": "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+      "The 7-Day Reset: Clarity, Confidence, and Communication": "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+      "The 30-Day Foundation: Purpose-Driven Professionalism": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+      "The 45-Day Career Rewire: Aligning Work with Self": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+      "Leadership from Within: 21-Day Intensive for Founders & Changemakers": "https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+      "The Aaruchudar Educator Program (30 Days or Custom)": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+      "Institutional Innovation Catalyst": "https://images.unsplash.com/photo-1553877522-43269d4ea984?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+      "Custom Sprint Labs / Retreats": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+    };
+    return backgrounds[title] || "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80";
+  };
 
   const [participants, setParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -233,34 +533,91 @@ const ParticipantsPage = () => {
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
+  const [organizations, setOrganizations] = useState([]);
 
   const organizationId = paramOrgId || user?.organizationId;
 
   useEffect(() => {
     const fetchData = async () => {
-      if (authLoading || !user || !organizationId) {
-        if (!authLoading && (!user || !organizationId)) {
-          setError("Admin profile or organization ID not found.");
-          setLoading(false);
-        }
+      if (authLoading) return;
+      
+      if (!user) {
+        setError("User not authenticated.");
+        setLoading(false);
         return;
       }
+      
+      console.log("Current user:", user);
+      console.log("User organizationId:", user.organizationId);
+      console.log("Param organizationId:", paramOrgId);
+      console.log("Final organizationId:", organizationId);
 
       setLoading(true);
       setError("");
 
       try {
-        // Fetch Organization Name
-        const orgDocRef = doc(db, "Organizations", organizationId);
-        const orgSnap = await getDoc(orgDocRef);
-        if (orgSnap.exists()) {
-          setOrganizationName(orgSnap.data().name || "Unknown Organization");
+        // Fetch Organizations
+        const orgSnapshot = await getDocs(collection(db, "Organizations"));
+        const orgData = orgSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setOrganizations(orgData);
+
+        // Set organization name based on context
+        if (courseFilter && courseTitle) {
+          setOrganizationName(`Course: ${decodeURIComponent(courseTitle)}`);
+        } else if (categoryFilter) {
+          const categoryName = categoryFilter.charAt(0).toUpperCase() + categoryFilter.slice(1) + 's';
+          setOrganizationName(`${categoryName} Category`);
+        } else if (organizationId && organizationId !== 'undefined') {
+          const orgDocRef = doc(db, "Organizations", organizationId);
+          const orgSnap = await getDoc(orgDocRef);
+          if (orgSnap.exists()) {
+            setOrganizationName(orgSnap.data().name || "Unknown Organization");
+          } else {
+            setOrganizationName("Unknown Organization");
+          }
+        } else {
+          setOrganizationName("All Organizations");
         }
 
-        // Fetch Participants
-        const q = query(collection(db, "Users"), where("organizationId", "==", organizationId));
+        // Fetch Participants (only users with role 'user')
+        let q;
+        if (organizationId && organizationId !== 'undefined') {
+          q = query(
+            collection(db, "Users"), 
+            where("organizationId", "==", organizationId),
+            where("role", "==", "user")
+          );
+        } else {
+          // Fallback: fetch all users with role 'user'
+          q = query(
+            collection(db, "Users"), 
+            where("role", "==", "user")
+          );
+        }
+        
         const snapshot = await getDocs(q);
-        const results = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        let results = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        
+        // Apply category filtering if specified
+        if (categoryFilter) {
+          const filteredOrgIds = orgData
+            .filter(org => org.type && org.type.toLowerCase() === categoryFilter.toLowerCase())
+            .map(org => org.id);
+          results = results.filter(user => filteredOrgIds.includes(user.organizationId));
+        }
+        
+        // Apply course filtering if specified
+        if (courseFilter) {
+          results = results.filter(user => {
+            if (!user.courses) return false;
+            let coursesArray = Array.isArray(user.courses) ? user.courses : [user.courses];
+            return coursesArray.some(course => 
+              String(course).toLowerCase().trim() === courseFilter.toLowerCase()
+            );
+          });
+        }
+        
+        console.log("Fetched participants:", results);
         setParticipants(results);
 
       } catch (err) {
@@ -331,68 +688,81 @@ const ParticipantsPage = () => {
     );
   }
 
+  const backgroundImage = courseFilter && courseTitle ? 
+    getCourseBackgroundImage(decodeURIComponent(courseTitle)) : 
+    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80';
+
   return (
-    <PageContainer>
+    <PageContainer backgroundImage={backgroundImage}>
       <AdminSidebar />
       <ContentWrapper>
         <Header>
-          <PageTitle>Participants</PageTitle>
-          <PageSubtitle>Manage and view all participants in {organizationName}</PageSubtitle>
+          <BackButton onClick={() => navigate(-1)}>
+            ←
+          </BackButton>
+          <HeaderContent>
+            <PageTitle>Participants</PageTitle>
+            <PageSubtitle>Manage and view all participants in {organizationName}</PageSubtitle>
+          </HeaderContent>
         </Header>
 
-        <StatsCards>
-          <StatCard onClick={() => setActiveFilter("all")}>
-            <StatValue>{total}</StatValue>
-            <StatLabel>Total Participants</StatLabel>
-          </StatCard>
-          <StatCard onClick={() => setActiveFilter("hilabs")}>
-            <StatValue>{hiLabs}</StatValue>
-            <StatLabel>HI Labs Enrolled</StatLabel>
-          </StatCard>
-          <StatCard onClick={() => setActiveFilter("courses")}>
-            <StatValue>{courses}</StatValue>
-            <StatLabel>Courses Enrolled</StatLabel>
-          </StatCard>
-          <StatCard onClick={() => setActiveFilter("completed")}>
-            <StatValue>{completed}</StatValue>
-            <StatLabel>Completed</StatLabel>
-          </StatCard>
-        </StatsCards>
+        {!courseFilter && (
+          <>
+            <StatsCards>
+              <StatCard onClick={() => setActiveFilter("all")}>
+                <StatValue>{total}</StatValue>
+                <StatLabel>Total Participants</StatLabel>
+              </StatCard>
+              <StatCard onClick={() => setActiveFilter("hilabs")}>
+                <StatValue>{hiLabs}</StatValue>
+                <StatLabel>HI Labs Enrolled</StatLabel>
+              </StatCard>
+              <StatCard onClick={() => setActiveFilter("courses")}>
+                <StatValue>{courses}</StatValue>
+                <StatLabel>Courses Enrolled</StatLabel>
+              </StatCard>
+              <StatCard onClick={() => setActiveFilter("completed")}>
+                <StatValue>{completed}</StatValue>
+                <StatLabel>Completed</StatLabel>
+              </StatCard>
+            </StatsCards>
 
-        <FiltersSection>
-          <FilterRow>
-            <SearchInput
-              type="text"
-              placeholder="Search participants by name or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <FilterButton
-              active={activeFilter === "all"}
-              onClick={() => setActiveFilter("all")}
-            >
-              All
-            </FilterButton>
-            <FilterButton
-              active={activeFilter === "hilabs"}
-              onClick={() => setActiveFilter("hilabs")}
-            >
-              HI Labs
-            </FilterButton>
-            <FilterButton
-              active={activeFilter === "courses"}
-              onClick={() => setActiveFilter("courses")}
-            >
-              Courses
-            </FilterButton>
-            <FilterButton
-              active={activeFilter === "completed"}
-              onClick={() => setActiveFilter("completed")}
-            >
-              Completed
-            </FilterButton>
-          </FilterRow>
-        </FiltersSection>
+            <FiltersSection>
+              <FilterRow>
+                <SearchInput
+                  type="text"
+                  placeholder="Search participants by name or email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <FilterButton
+                  active={activeFilter === "all"}
+                  onClick={() => setActiveFilter("all")}
+                >
+                  All
+                </FilterButton>
+                <FilterButton
+                  active={activeFilter === "hilabs"}
+                  onClick={() => setActiveFilter("hilabs")}
+                >
+                  HI Labs
+                </FilterButton>
+                <FilterButton
+                  active={activeFilter === "courses"}
+                  onClick={() => setActiveFilter("courses")}
+                >
+                  Courses
+                </FilterButton>
+                <FilterButton
+                  active={activeFilter === "completed"}
+                  onClick={() => setActiveFilter("completed")}
+                >
+                  Completed
+                </FilterButton>
+              </FilterRow>
+            </FiltersSection>
+          </>
+        )}
 
         <ParticipantsTable>
           <TableHeader>
@@ -420,19 +790,40 @@ const ParticipantsPage = () => {
                   <div>
                     <div>{participant.username || participant.email?.split('@')[0]}</div>
                     <div style={{fontSize: '0.8rem', color: '#64748b'}}>{participant.email}</div>
+                    {categoryFilter && (
+                      <div style={{fontSize: '0.75rem', color: '#94a3b8'}}>
+                        {organizations.find(org => org.id === participant.organizationId)?.name || 'Unknown Org'}
+                      </div>
+                    )}
                   </div>
                 </ParticipantName>
-                <div>{participant.labName || participant.courses?.[0] || "Not enrolled"}</div>
-                <div>{participant.completion || 0}%</div>
-                <div>
+                <div className="desktop-only">{participant.labName || participant.courses?.[0] || "Not enrolled"}</div>
+                <div className="desktop-only">{participant.completion || 0}%</div>
+                <div className="desktop-only">
                   <Badge type={participant.completion >= 100 ? 'completed' : participant.labName ? 'active' : 'inactive'}>
                     {participant.completion >= 100 ? 'Completed' : participant.labName ? 'Active' : 'Inactive'}
                   </Badge>
                 </div>
-                <div>
+                <div className="desktop-only">
                   <ViewButton onClick={(e) => { e.stopPropagation(); handleViewParticipant(participant.id); }}>
                     View
                   </ViewButton>
+                </div>
+                <div className="mobile-only" style={{display: 'none'}}>
+                  <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px'}}>
+                    <div>
+                      <div style={{fontSize: '0.8rem', color: '#64748b'}}>Lab/Course: {participant.labName || participant.courses?.[0] || "Not enrolled"}</div>
+                      <div style={{fontSize: '0.8rem', color: '#64748b'}}>Progress: {participant.completion || 0}%</div>
+                    </div>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                      <Badge type={participant.completion >= 100 ? 'completed' : participant.labName ? 'active' : 'inactive'}>
+                        {participant.completion >= 100 ? 'Completed' : participant.labName ? 'Active' : 'Inactive'}
+                      </Badge>
+                      <ViewButton onClick={(e) => { e.stopPropagation(); handleViewParticipant(participant.id); }}>
+                        View
+                      </ViewButton>
+                    </div>
+                  </div>
                 </div>
               </TableRow>
             ))

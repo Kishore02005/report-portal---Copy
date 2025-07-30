@@ -15,10 +15,23 @@ const PageContainer = styled.div`
 
 const ContentWrapper = styled.div`
   flex: 1;
-  padding: 32px;
   margin-left: 300px;
-  max-width: 1400px;
-  margin-right: auto;
+  padding: 32px;
+  width: calc(100% - 300px);
+  box-sizing: border-box;
+  
+  @media (max-width: 1024px) {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+    padding: 24px;
+  }
+  
+  @media (max-width: 768px) {
+    margin-left: 0;
+    width: 100%;
+    padding: 20px;
+    padding-top: 80px;
+  }
 `;
 
 const Header = styled.div`
@@ -217,7 +230,11 @@ const OrganizationCategoryPage = () => {
         const formattedCategory = singularCategory.charAt(0).toUpperCase() + singularCategory.slice(1);
         const q = query(collection(db, "Organizations"), where("type", "==", formattedCategory));
         const snapshot = await getDocs(q);
-        const orgs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const orgs = snapshot.docs.map(doc => {
+          const data = doc.data();
+          console.log('Organization data:', data); // Debug log
+          return { id: doc.id, ...data };
+        });
         setOrganizations(orgs);
       } catch (err) {
         console.error("Error fetching organizations by category:", err);
@@ -304,7 +321,32 @@ const OrganizationCategoryPage = () => {
                     <OrgDetails>
                       <Detail>
                         <DetailLabel>📅 Joined:</DetailLabel>
-                        {org.joinedDate || "N/A"}
+                        {(() => {
+                          // Check all possible date fields
+                          const possibleDates = [
+                            org.joinedOn, org.joinedDate, org.createdAt, org.dateCreated, 
+                            org.enrolledDate, org.created_at, org.timestamp,
+                            org.registrationDate, org.signupDate
+                          ];
+                          
+                          for (let dateValue of possibleDates) {
+                            if (dateValue && dateValue !== "N/A" && dateValue !== null) {
+                              try {
+                                const date = new Date(dateValue);
+                                if (!isNaN(date.getTime())) {
+                                  return date.toLocaleDateString('en-US', { 
+                                    year: 'numeric', 
+                                    month: 'short', 
+                                    day: 'numeric' 
+                                  });
+                                }
+                              } catch (e) {
+                                continue;
+                              }
+                            }
+                          }
+                          return "Not Available";
+                        })()}
                       </Detail>
                       <Detail>
                         <DetailLabel>🏢 Type:</DetailLabel>

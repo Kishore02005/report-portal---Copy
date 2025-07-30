@@ -8,103 +8,130 @@ import AdminSidebar from "../components/AdminSidebar"; // Import AdminSidebar di
 
 const PageContainer = styled.div`
   min-height: 100vh;
-  background: #f8f9fc;
-  font-family: "Poppins", sans-serif;
+  background: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   display: flex;
-  
-  /* Adjust margin-left to account for fixed Sidebar */
-  margin-left: 250px; /* Sidebar width */
+  margin-left: 250px;
 `;
 
 const ContentWrapper = styled.div`
   flex: 1;
-  max-width: 900px;
+  max-width: 600px;
   margin: 0 auto;
-  padding: 30px;
-  text-align: center;
+  padding: 2rem;
 `;
 
 const Header = styled.h2`
-  font-size: 2rem;
-  color: #2c3e50;
-  margin-bottom: 20px;
+  font-size: 1.875rem;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
   text-align: center;
+  font-weight: 600;
 `;
 
 const InfoCard = styled.div`
   background: white;
   border-radius: 12px;
-  padding: 25px 30px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  margin-top: 25px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  margin-top: 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
 `;
 
-const Field = styled.p`
-  font-size: 1rem;
-  margin: 10px 0;
+const Field = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
-  text-align: left;
-  span {
-    font-weight: 600;
-    color: #555;
-    display: inline-block;
-    min-width: 120px;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.95rem;
+  
+  &:last-child {
+    border-bottom: none;
   }
 `;
 
+const FieldLabel = styled.span`
+  color: #64748b;
+  font-weight: 500;
+`;
+
+const FieldValue = styled.span`
+  color: #1e293b;
+  font-weight: 600;
+  text-align: right;
+`;
+
 const ProfileImage = styled.img`
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
   border-radius: 50%;
-  margin-bottom: 20px;
-  border: 4px solid #e0e0e0;
+  margin-bottom: 1.5rem;
+  border: 3px solid #f1f5f9;
 `;
 
-const SectionTitle = styled.h3`
-  font-size: 1.5rem;
-  color: #3f51b5;
-  margin-top: 40px;
-  margin-bottom: 20px;
-  width: 100%;
-  text-align: left;
-`;
-
-const ReportLink = styled.a`
-  color: #5c6bc0;
-  text-decoration: none;
+const UserName = styled.h3`
+  font-size: 1.25rem;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
   font-weight: 600;
+  text-align: center;
+`;
+
+const UserEmail = styled.p`
+  color: #64748b;
   font-size: 0.9rem;
-  margin-top: 5px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+`;
+
+const ActionLink = styled.a`
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.75rem;
+  background: #eff6ff;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  
   &:hover {
-    text-decoration: underline;
+    background: #dbeafe;
+    text-decoration: none;
   }
 `;
 
 const BackButton = styled.button`
-  margin-top: 30px;
-  background-color: #5c6bc0;
+  margin-top: 2rem;
+  background: #3b82f6;
   color: white;
   border: none;
   border-radius: 8px;
-  padding: 12px 20px;
-  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background 0.2s ease;
+  font-size: 0.9rem;
 
   &:hover {
-    background-color: #3f51b5;
+    background: #2563eb;
   }
 `;
 
 const ErrorText = styled.p`
-  color: #d32f2f;
+  color: #dc2626;
   text-align: center;
-  margin-top: 30px;
+  margin-top: 2rem;
   font-size: 1rem;
+  background: #fef2f2;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
 `;
 
 const ParticipantDetails = () => {
@@ -112,6 +139,7 @@ const ParticipantDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [userData, setUserData] = useState(null);
+  const [organizationName, setOrganizationName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -131,7 +159,26 @@ const ParticipantDetails = () => {
         const userDocSnap = await getDoc(userDocRef);
 
         if (userDocSnap.exists()) {
-          setUserData({ id: userDocSnap.id, ...userDocSnap.data() });
+          const data = { id: userDocSnap.id, ...userDocSnap.data() };
+          setUserData(data);
+          
+          // Fetch organization name if organizationId exists
+          if (data.organizationId && data.organizationId !== "Independent") {
+            try {
+              const orgDocRef = doc(db, "Organizations", data.organizationId);
+              const orgDocSnap = await getDoc(orgDocRef);
+              if (orgDocSnap.exists()) {
+                setOrganizationName(orgDocSnap.data().name || data.organizationId);
+              } else {
+                setOrganizationName(data.organizationId);
+              }
+            } catch (orgErr) {
+              console.error("Error fetching organization:", orgErr);
+              setOrganizationName(data.organizationId);
+            }
+          } else {
+            setOrganizationName("Independent");
+          }
         } else {
           setError("Participant data not found.");
           setUserData(null);
@@ -167,49 +214,49 @@ const ParticipantDetails = () => {
               src={userData.photoURL || "https://i.pravatar.cc/150"}
               alt="Profile"
             />
+            <UserName>{userData.username || "N/A"}</UserName>
+            <UserEmail>{userData.email || "N/A"}</UserEmail>
+            
             <Field>
-              <span>Name:</span> {userData.username || "N/A"}
+              <FieldLabel>Organization:</FieldLabel>
+              <FieldValue>{organizationName || "Independent"}</FieldValue>
             </Field>
             <Field>
-              <span>Email:</span> {userData.email || "N/A"}
+              <FieldLabel>Enrolled In:</FieldLabel>
+              <FieldValue>{userData.labName || "N/A"}</FieldValue>
             </Field>
             <Field>
-              <span>Organization:</span> {userData.organizationId || "Independent"}
+              <FieldLabel>Enrollment Date:</FieldLabel>
+              <FieldValue>{userData.enrolment ? new Date(userData.enrolment).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : "N/A"}</FieldValue>
             </Field>
             <Field>
-              <span>Role:</span> {userData.role || "N/A"}
+              <FieldLabel>Progress:</FieldLabel>
+              <FieldValue>{userData.completion || 0}%</FieldValue>
             </Field>
-            <Field>
-              <span>Enrolled In:</span> {userData.labName || "N/A"}
-            </Field>
-            <Field>
-              <span>Enrolment Date:</span> {userData.enrolment || "N/A"}
-            </Field>
-            <Field>
-              <span>Completion:</span> {userData.completion || 0}%
-            </Field>
+            {userData.courses && userData.courses.length > 0 && (
+              <Field>
+                <FieldLabel>Courses:</FieldLabel>
+                <FieldValue>{userData.courses.length} enrolled</FieldValue>
+              </Field>
+            )}
             {userData.reportUrl && (
               <Field>
-                <span>Report:</span>{" "}
-                <ReportLink href={userData.reportUrl} target="_blank" rel="noopener noreferrer">
+                <FieldLabel>Report:</FieldLabel>
+                <ActionLink href={userData.reportUrl} target="_blank" rel="noopener noreferrer">
                   View Report
-                </ReportLink>
+                </ActionLink>
               </Field>
             )}
             {userData.certificates && userData.certificates.length > 0 && (
               <Field>
-                <span>Certificates:</span>{" "}
-                {userData.certificates.map((certUrl, index) => (
-                  <ReportLink key={index} href={certUrl} target="_blank" rel="noopener noreferrer" style={{ marginLeft: '5px' }}>
-                    Cert {index + 1}
-                  </ReportLink>
-                ))}
-              </Field>
-            )}
-            {userData.courses && userData.courses.length > 0 && (
-              <Field>
-                <span>Courses:</span>{" "}
-                {userData.courses.join(", ") || "N/A"}
+                <FieldLabel>Achievements:</FieldLabel>
+                <ActionLink 
+                  href={`/achievements/${userData.email}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  View Certificates
+                </ActionLink>
               </Field>
             )}
 
