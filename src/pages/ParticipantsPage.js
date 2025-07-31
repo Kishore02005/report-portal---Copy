@@ -55,70 +55,78 @@ const ContentWrapper = styled.div`
   
   @media (max-width: 768px) {
     margin-left: 0;
-    padding: 16px;
-    padding-top: 76px;
+    padding: 12px;
+    padding-top: 70px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 8px;
+    padding-top: 65px;
   }
 `;
 
 const Header = styled.div`
-  margin-bottom: 32px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-`;
-
-const BackButton = styled.button`
-  background: rgba(255, 255, 255, 0.9);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
-  padding: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  color: #1e293b;
-  backdrop-filter: blur(10px);
+  margin-bottom: 40px;
+  text-align: center;
   
-  &:hover {
-    background: rgba(255, 255, 255, 1);
-    border-color: rgba(59, 130, 246, 0.3);
-    color: #3b82f6;
-    transform: translateX(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  @media (max-width: 768px) {
+    margin-bottom: 24px;
   }
 `;
 
-const HeaderContent = styled.div`
-  flex: 1;
-`;
+
+
+
 
 const PageTitle = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 2.5rem;
+  font-weight: 800;
   color: white;
-  margin: 0 0 8px 0;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  margin: 0 0 12px 0;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
   font-family: 'Poppins', 'Inter', sans-serif;
+  letter-spacing: -0.025em;
+  
+  @media (max-width: 768px) {
+    font-size: 2rem;
+    margin-bottom: 8px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+  }
 `;
 
 const PageSubtitle = styled.p`
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1.1rem;
   margin: 0;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
   font-weight: 500;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.5;
+  
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    max-width: 90%;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+    max-width: 95%;
+  }
 `;
 
 const FiltersSection = styled.div`
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 28px;
-  margin-bottom: 28px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.1);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(59, 130, 246, 0.15);
   position: relative;
   overflow: hidden;
   
@@ -128,7 +136,7 @@ const FiltersSection = styled.div`
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 4px;
     background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
     background-size: 200% 100%;
     animation: shimmer 3s ease-in-out infinite;
@@ -137,6 +145,17 @@ const FiltersSection = styled.div`
   @keyframes shimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
+  }
+  
+  @media (max-width: 768px) {
+    padding: 24px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 20px;
+    margin-bottom: 20px;
   }
 `;
 
@@ -229,32 +248,39 @@ const FilterButton = styled.button`
 
 const StatsCards = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
   
   @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
+    margin-bottom: 24px;
   }
   
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
     gap: 12px;
+    margin-bottom: 20px;
   }
 `;
 
 const StatCard = styled.div`
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 28px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.1);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(59, 130, 246, 0.15);
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  text-align: center;
   
   &::before {
     content: '';
@@ -268,8 +294,8 @@ const StatCard = styled.div`
   }
   
   &:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 12px 32px rgba(59, 130, 246, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 16px 48px rgba(59, 130, 246, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1);
     background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
     color: white;
     
@@ -280,10 +306,19 @@ const StatCard = styled.div`
   
   @media (max-width: 768px) {
     padding: 24px;
+    border-radius: 16px;
+    
+    &:hover {
+      transform: translateY(-4px) scale(1.02);
+    }
   }
   
   @media (max-width: 480px) {
     padding: 20px;
+    
+    &:hover {
+      transform: translateY(-2px) scale(1.01);
+    }
   }
 `;
 
@@ -313,11 +348,11 @@ const StatLabel = styled.div`
 `;
 
 const ParticipantsTable = styled.div`
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.1);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(59, 130, 246, 0.15);
   overflow: hidden;
   position: relative;
   
@@ -327,7 +362,7 @@ const ParticipantsTable = styled.div`
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 4px;
     background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
     background-size: 200% 100%;
     animation: shimmer 3s ease-in-out infinite;
@@ -343,6 +378,7 @@ const ParticipantsTable = styled.div`
     backdrop-filter: none;
     box-shadow: none;
     border: none;
+    border-radius: 0;
     
     &::before {
       display: none;
@@ -406,11 +442,12 @@ const TableRow = styled.div`
   @media (max-width: 768px) {
     display: block;
     padding: 16px;
-    background: white;
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
     margin-bottom: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     
     .desktop-only {
       display: none;
@@ -419,6 +456,17 @@ const TableRow = styled.div`
     .mobile-only {
       display: block !important;
     }
+    
+    &:hover {
+      background: rgba(255, 255, 255, 1);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    padding: 12px;
+    margin-bottom: 8px;
   }
 `;
 
@@ -429,6 +477,22 @@ const ParticipantName = styled.div`
   align-items: center;
   gap: 12px;
   font-family: 'Poppins', 'Inter', sans-serif;
+  
+  @media (max-width: 480px) {
+    gap: 8px;
+    
+    div {
+      font-size: 0.9rem;
+      
+      div:nth-child(2) {
+        font-size: 0.75rem !important;
+      }
+      
+      div:nth-child(3) {
+        font-size: 0.7rem !important;
+      }
+    }
+  }
 `;
 
 const Avatar = styled.img`
@@ -437,6 +501,12 @@ const Avatar = styled.img`
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #f1f5f9;
+  flex-shrink: 0;
+  
+  @media (max-width: 480px) {
+    width: 28px;
+    height: 28px;
+  }
 `;
 
 const Badge = styled.span`
@@ -468,6 +538,7 @@ const ViewButton = styled.button`
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  white-space: nowrap;
   
   &::before {
     content: '';
@@ -489,12 +560,29 @@ const ViewButton = styled.button`
       left: 100%;
     }
   }
+  
+  @media (max-width: 480px) {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
 `;
 
 const EmptyState = styled.div`
-  padding: 48px 24px;
+  padding: 64px 32px;
   text-align: center;
   color: #64748b;
+  font-size: 1.1rem;
+  font-weight: 500;
+  
+  @media (max-width: 768px) {
+    padding: 48px 24px;
+    font-size: 1rem;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 32px 16px;
+    font-size: 0.9rem;
+  }
 `;
 
 const ErrorText = styled.p`
@@ -697,13 +785,8 @@ const ParticipantsPage = () => {
       <AdminSidebar />
       <ContentWrapper>
         <Header>
-          <BackButton onClick={() => navigate(-1)}>
-            ←
-          </BackButton>
-          <HeaderContent>
-            <PageTitle>Participants</PageTitle>
-            <PageSubtitle>Manage and view all participants in {organizationName}</PageSubtitle>
-          </HeaderContent>
+          <PageTitle>Participants</PageTitle>
+          <PageSubtitle>Manage and view all participants in {organizationName}</PageSubtitle>
         </Header>
 
         {!courseFilter && (
@@ -810,18 +893,26 @@ const ParticipantsPage = () => {
                   </ViewButton>
                 </div>
                 <div className="mobile-only" style={{display: 'none'}}>
-                  <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px'}}>
-                    <div>
-                      <div style={{fontSize: '0.8rem', color: '#64748b'}}>Lab/Course: {participant.labName || participant.courses?.[0] || "Not enrolled"}</div>
-                      <div style={{fontSize: '0.8rem', color: '#64748b'}}>Progress: {participant.completion || 0}%</div>
-                    </div>
-                    <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                      <Badge type={participant.completion >= 100 ? 'completed' : participant.labName ? 'active' : 'inactive'}>
-                        {participant.completion >= 100 ? 'Completed' : participant.labName ? 'Active' : 'Inactive'}
-                      </Badge>
-                      <ViewButton onClick={(e) => { e.stopPropagation(); handleViewParticipant(participant.id); }}>
-                        View
-                      </ViewButton>
+                  <div style={{marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #f1f5f9'}}>
+                    <div style={{display: 'grid', gridTemplateColumns: '1fr auto', gap: '12px', alignItems: 'start'}}>
+                      <div style={{minWidth: 0}}>
+                        <div style={{fontSize: '0.8rem', color: '#64748b', marginBottom: '4px'}}>
+                          <strong>Lab/Course:</strong> {participant.labName || participant.courses?.[0] || "Not enrolled"}
+                        </div>
+                        <div style={{fontSize: '0.8rem', color: '#64748b', marginBottom: '4px'}}>
+                          <strong>Progress:</strong> {participant.completion || 0}%
+                        </div>
+                        <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px'}}>
+                          <Badge type={participant.completion >= 100 ? 'completed' : participant.labName ? 'active' : 'inactive'}>
+                            {participant.completion >= 100 ? 'Completed' : participant.labName ? 'Active' : 'Inactive'}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div style={{display: 'flex', alignItems: 'flex-start'}}>
+                        <ViewButton onClick={(e) => { e.stopPropagation(); handleViewParticipant(participant.id); }}>
+                          View
+                        </ViewButton>
+                      </div>
                     </div>
                   </div>
                 </div>

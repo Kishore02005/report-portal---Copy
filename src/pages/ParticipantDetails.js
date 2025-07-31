@@ -11,7 +11,10 @@ const PageContainer = styled.div`
   background: #f8fafc;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   display: flex;
-  margin-left: 250px;
+  
+  @media (min-width: 769px) {
+    margin-left: 250px;
+  }
 `;
 
 const ContentWrapper = styled.div`
@@ -19,6 +22,17 @@ const ContentWrapper = styled.div`
   max-width: 600px;
   margin: 0 auto;
   padding: 2rem;
+  
+  @media (max-width: 768px) {
+    padding: 1rem;
+    padding-top: 80px;
+    max-width: 100%;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 0.75rem;
+    padding-top: 75px;
+  }
 `;
 
 const Header = styled.h2`
@@ -27,6 +41,15 @@ const Header = styled.h2`
   margin-bottom: 1.5rem;
   text-align: center;
   font-weight: 600;
+  
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1.25rem;
+  }
 `;
 
 const InfoCard = styled.div`
@@ -39,6 +62,17 @@ const InfoCard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    margin-top: 1rem;
+    border-radius: 8px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 1rem;
+    margin-top: 0.75rem;
+  }
 `;
 
 const Field = styled.div`
@@ -53,6 +87,18 @@ const Field = styled.div`
   &:last-child {
     border-bottom: none;
   }
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+    gap: 0.25rem;
+  }
 `;
 
 const FieldLabel = styled.span`
@@ -64,6 +110,11 @@ const FieldValue = styled.span`
   color: #1e293b;
   font-weight: 600;
   text-align: right;
+  
+  @media (max-width: 768px) {
+    text-align: left;
+    word-break: break-word;
+  }
 `;
 
 const ProfileImage = styled.img`
@@ -117,9 +168,21 @@ const BackButton = styled.button`
   cursor: pointer;
   transition: background 0.2s ease;
   font-size: 0.9rem;
+  width: 100%;
+  max-width: 200px;
 
   &:hover {
     background: #2563eb;
+  }
+  
+  @media (max-width: 768px) {
+    margin-top: 1.5rem;
+    max-width: 100%;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
   }
 `;
 

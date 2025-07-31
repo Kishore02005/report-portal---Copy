@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { db } from "../firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
 import UserNavbar from "../components/UserNavbar";
 import AdminSidebar from "../components/AdminSidebar";
@@ -38,6 +38,36 @@ const ContentWrapper = styled.div`
   margin: 0 auto;
   padding: 40px 30px;
   text-align: center;
+  position: relative;
+`;
+
+const BackButton = styled.button`
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #64748b;
+  
+  &:hover {
+    background: #f8fafc;
+    border-color: #3b82f6;
+    color: #3b82f6;
+  }
+  
+  @media (max-width: 768px) {
+    position: static;
+    margin-bottom: 20px;
+    align-self: flex-start;
+  }
 `;
 
 const Heading = styled.h2`
@@ -233,10 +263,12 @@ const ErrorText = styled.p`
 const AchievementPage = () => {
   const { user, loading: authLoading } = useAuth();
   const { userEmail } = useParams();
+  const navigate = useNavigate();
   const [certificates, setCertificates] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
   const [error, setError] = useState("");
   const [targetUserData, setTargetUserData] = useState(null);
+  const [participantId, setParticipantId] = useState(null);
   
   const isAdminView = !!userEmail;
   const targetEmail = userEmail || user?.email;
@@ -280,6 +312,7 @@ const AchievementPage = () => {
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
           setTargetUserData(userData);
+          setParticipantId(userDocSnap.id);
           const fetchedCerts = userData.certificates || [];
           console.log("Fetched certificates:", fetchedCerts); // Debug log
           setCertificates(fetchedCerts);
@@ -306,6 +339,11 @@ const AchievementPage = () => {
     <PageContainer isAdminView={isAdminView}>
       {isAdminView ? <AdminSidebar /> : <UserNavbar />}
       <ContentWrapper>
+        {isAdminView && (
+          <BackButton onClick={() => navigate(`/participants/${participantId}`)}>
+            ← Back to Participant
+          </BackButton>
+        )}
         <Heading>{isAdminView ? `${targetUserData?.username || 'User'}'s Achievements` : 'Your Achievements'}</Heading>
         <Subtext>
           Below are the certificates for courses and labs you have successfully completed.
