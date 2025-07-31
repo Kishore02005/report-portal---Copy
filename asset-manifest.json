@@ -1,12 +1,12 @@
 {
   "files": {
-    "main.js": "/report-portal---Copy/static/js/main.77eeb32c.js",
+    "main.js": "/report-portal---Copy/static/js/main.8ab1cc97.js",
     "static/media/Aaruchudar Final Logo (1).png": "/report-portal---Copy/static/media/Aaruchudar Final Logo (1).09094cccc49e45fffa8b.png",
     "static/media/ai-vs-human-intelligence-debate.webp": "/report-portal---Copy/static/media/ai-vs-human-intelligence-debate.8b68bce013b6b254ef9b.webp",
     "index.html": "/report-portal---Copy/index.html",
-    "main.77eeb32c.js.map": "/report-portal---Copy/static/js/main.77eeb32c.js.map"
+    "main.8ab1cc97.js.map": "/report-portal---Copy/static/js/main.8ab1cc97.js.map"
   },
   "entrypoints": [
-    "static/js/main.77eeb32c.js"
+    "static/js/main.8ab1cc97.js"
   ]
 }
