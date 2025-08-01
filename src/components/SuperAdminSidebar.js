@@ -8,6 +8,9 @@ import { useAuth } from "../context/AuthContext";
 import useResponsive from "../hooks/useResponsive";
 import logo from "../assets/Aaruchudar Final Logo (1).png";
 
+// Fallback logo URL in case import fails
+const logoFallback = "/logo192.png";
+
 const SidebarContainer = styled.div`
   width: 300px;
   height: 100vh;
@@ -105,6 +108,10 @@ const BrandSection = styled(NavLink)`
 const Logo = styled.img`
   height: 40px;
   width: auto;
+  
+  &:error {
+    content: url(${logoFallback});
+  }
 `;
 
 const BrandText = styled.h2`
@@ -180,20 +187,13 @@ const ProfileSection = styled.div`
 const ProfileCard = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
   padding: 12px;
   background: #334155;
   border-radius: 8px;
   margin-bottom: 16px;
 `;
 
-const ProfileImage = styled.img`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #475569;
-`;
+
 
 const UserInfo = styled.div`
   flex: 1;
@@ -259,7 +259,6 @@ const SuperAdminSidebar = () => {
     setIsOpen(!isOpen);
   };
 
-  const profileImg = user?.photoURL || "https://i.pravatar.cc/150?img=5";
   const userName = user?.displayName || user?.email?.split("@")[0] || "User";
 
   let logoDashboardLink = "/superadmin";
@@ -271,7 +270,12 @@ const SuperAdminSidebar = () => {
           ☰
         </MobileMenuButton>
         <MobileLogo>
-          <Logo src={logo} alt="Aaruchudar Logo" style={{ height: '24px' }} />
+          <Logo 
+            src={logo} 
+            alt="Aaruchudar Logo" 
+            style={{ height: '24px' }}
+            onError={(e) => { e.target.src = logoFallback; }}
+          />
           <BrandText style={{ fontSize: '1.2rem' }}>Aaruchudar</BrandText>
         </MobileLogo>
         <div style={{ width: '24px' }}></div>
@@ -282,7 +286,11 @@ const SuperAdminSidebar = () => {
       <SidebarContainer $isOpen={isOpen}>
         <Header>
         <BrandSection to={logoDashboardLink}>
-          <Logo src={logo} alt="Aaruchudar Logo" />
+          <Logo 
+            src={logo} 
+            alt="Aaruchudar Logo" 
+            onError={(e) => { e.target.src = logoFallback; }}
+          />
           <BrandText>Aaruchudar</BrandText>
         </BrandSection>
       </Header>
@@ -315,7 +323,6 @@ const SuperAdminSidebar = () => {
       
       <ProfileSection>
         <ProfileCard>
-          <ProfileImage src={profileImg} alt={`${userName}'s Profile`} />
           <UserInfo>
             <Username>{userName}</Username>
             <UserRole>Super Administrator</UserRole>

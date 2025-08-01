@@ -117,14 +117,7 @@ const FieldValue = styled.span`
   }
 `;
 
-const ProfileImage = styled.img`
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 50%;
-  margin-bottom: 1.5rem;
-  border: 3px solid #f1f5f9;
-`;
+
 
 const UserName = styled.h3`
   font-size: 1.25rem;
@@ -273,10 +266,6 @@ const ParticipantDetails = () => {
           <ErrorText>Participant data not found.</ErrorText>
         ) : (
           <InfoCard>
-            <ProfileImage
-              src={userData.photoURL || "https://i.pravatar.cc/150"}
-              alt="Profile"
-            />
             <UserName>{userData.username || "N/A"}</UserName>
             <UserEmail>{userData.email || "N/A"}</UserEmail>
             

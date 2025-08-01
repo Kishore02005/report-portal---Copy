@@ -15,10 +15,25 @@ const fadeIn = keyframes`
 /* -------------------- STYLED COMPONENTS -------------------- */
 const PageContainer = styled.div`
   min-height: 100vh;
-  background: #f8fafc;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   display: flex;
   flex-direction: column;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
 `;
 
 const ContentWrapper = styled.div`
@@ -31,6 +46,8 @@ const ContentWrapper = styled.div`
   min-height: calc(100vh - 5.25rem);
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 1;
   
   @media (max-width: 1024px) {
     padding: 1rem 1.25rem;
@@ -93,7 +110,7 @@ const Card = styled.div`
   background: white;
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   border: 1px solid #e2e8f0;
   animation: ${fadeIn} 0.6s ease;
   
@@ -123,14 +140,7 @@ const MainContent = styled.div`
   flex: 1;
 `;
 
-const ProfileImage = styled.img`
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 16px;
-  border: 3px solid #f1f5f9;
-`;
+
 
 const UserName = styled.h2`
   color: #1e293b;
@@ -449,10 +459,6 @@ const UserDashboard = () => {
         ) : (
           <DashboardGrid>
             <ProfileCard>
-              <ProfileImage 
-                src={userData.photoURL || "https://i.pravatar.cc/150"} 
-                alt="Profile"
-              />
               <UserName>{userData.username || user?.email?.split("@")[0] || "User"}</UserName>
               <UserRole>Student</UserRole>
               

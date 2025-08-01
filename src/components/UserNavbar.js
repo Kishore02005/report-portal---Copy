@@ -7,6 +7,9 @@ import { auth } from "../firebaseConfig";
 import { useAuth } from "../context/AuthContext";
 import logo from "../assets/Aaruchudar Final Logo (1).png";
 
+// Fallback logo URL in case import fails
+const logoFallback = "/logo192.png";
+
 const NavbarContainer = styled.nav`
   background: #ffffff;
   color: #1e293b;
@@ -47,6 +50,10 @@ const Logo = styled.img`
   
   @media (max-width: 768px) {
     height: 32px;
+  }
+  
+  &:error {
+    content: url(${logoFallback});
   }
 `;
 
@@ -143,32 +150,9 @@ const ProfileSection = styled.div`
   }
 `;
 
-const ProfileImage = styled.img`
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #f1f5f9;
-`;
 
-const UserInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-`;
 
-const UserName = styled.span`
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #1e293b;
-  line-height: 1.2;
-`;
 
-const UserRole = styled.span`
-  font-size: 0.75rem;
-  color: #64748b;
-  line-height: 1.2;
-`;
 
 const LogoutButton = styled.button`
   background: #f8fafc;
@@ -217,14 +201,17 @@ const UserNavbar = () => {
     }
   };
 
-  const profileImg = user?.photoURL || "https://i.pravatar.cc/150?img=3";
-  const userName = user?.displayName || user?.email || "Guest";
+
 
   return (
     <>
       <NavbarContainer>
         <BrandSection>
-          <Logo src={logo} alt="Aaruchudar Logo" />
+          <Logo 
+            src={logo} 
+            alt="Aaruchudar Logo" 
+            onError={(e) => { e.target.src = logoFallback; }}
+          />
           <Brand>Aaruchudar</Brand>
         </BrandSection>
         
@@ -240,11 +227,6 @@ const UserNavbar = () => {
               <NavLink to="/courses-user">Courses</NavLink>
               <NavLink to="/hilabs-user">Labs</NavLink>
               <ProfileSection>
-                <ProfileImage src={profileImg} alt={`${userName}'s Profile`} />
-                <UserInfo>
-                  <UserName>{userName.split('@')[0] || userName}</UserName>
-                  <UserRole>Student</UserRole>
-                </UserInfo>
                 <LogoutButton onClick={handleLogout}>Sign Out</LogoutButton>
               </ProfileSection>
             </DesktopNavLinks>
@@ -258,11 +240,6 @@ const UserNavbar = () => {
         <NavLink to="/courses-user" onClick={() => setIsOpen(false)}>Courses</NavLink>
         <NavLink to="/hilabs-user" onClick={() => setIsOpen(false)}>Labs</NavLink>
         <ProfileSection>
-          <ProfileImage src={profileImg} alt={`${userName}'s Profile`} />
-          <UserInfo>
-            <UserName>{userName.split('@')[0] || userName}</UserName>
-            <UserRole>Student</UserRole>
-          </UserInfo>
           <LogoutButton onClick={handleLogout}>Sign Out</LogoutButton>
         </ProfileSection>
       </MobileNavLinks>

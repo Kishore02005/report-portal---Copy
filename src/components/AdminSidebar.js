@@ -8,6 +8,9 @@ import { useAuth } from "../context/AuthContext";
 import useResponsive from "../hooks/useResponsive";
 import logo from "../assets/Aaruchudar Final Logo (1).png";
 
+// Fallback logo URL in case import fails
+const logoFallback = "/logo192.png";
+
 const slideIn = keyframes`
   from { transform: translateX(-100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
@@ -162,6 +165,10 @@ const Logo = styled.img`
     filter: brightness(1.4) drop-shadow(0 6px 12px rgba(59, 130, 246, 0.5));
     animation: ${pulse} 2s infinite;
   }
+  
+  &:error {
+    content: url(${logoFallback});
+  }
 `;
 
 const BrandText = styled.h2`
@@ -298,7 +305,6 @@ const ProfileSection = styled.div`
 const ProfileCard = styled.div`
   display: flex;
   align-items: center;
-  gap: 16px;
   padding: 20px;
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
   border-radius: 20px;
@@ -314,22 +320,7 @@ const ProfileCard = styled.div`
   }
 `;
 
-const ProfileImage = styled.img`
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid transparent;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6) border-box;
-  background-clip: padding-box, border-box;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    transform: scale(1.1);
-    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
-    animation: ${pulse} 2s infinite;
-  }
-`;
+
 
 const UserInfo = styled.div`
   flex: 1;
@@ -415,7 +406,6 @@ const AdminSidebar = () => {
     setIsOpen(!isOpen);
   };
 
-  const profileImg = user?.photoURL || "https://i.pravatar.cc/150?img=5";
   const userName = user?.displayName || user?.email?.split("@")[0] || "User";
 
   let logoDashboardLink = "/admin";
@@ -427,7 +417,12 @@ const AdminSidebar = () => {
           ☰
         </MobileMenuButton>
         <MobileLogo>
-          <Logo src={logo} alt="Aaruchudar Logo" style={{ height: '24px' }} />
+          <Logo 
+            src={logo} 
+            alt="Aaruchudar Logo" 
+            style={{ height: '24px' }}
+            onError={(e) => { e.target.src = logoFallback; }}
+          />
           <BrandText>Aaruchudar</BrandText>
         </MobileLogo>
         <div style={{ width: '24px' }}></div>
@@ -438,7 +433,11 @@ const AdminSidebar = () => {
       <SidebarContainer $isOpen={isOpen}>
         <Header>
         <BrandSection to={logoDashboardLink}>
-          <Logo src={logo} alt="Aaruchudar Logo" />
+          <Logo 
+            src={logo} 
+            alt="Aaruchudar Logo" 
+            onError={(e) => { e.target.src = logoFallback; }}
+          />
           <BrandText>Aaruchudar</BrandText>
         </BrandSection>
       </Header>
@@ -459,7 +458,6 @@ const AdminSidebar = () => {
       
       <ProfileSection>
         <ProfileCard>
-          <ProfileImage src={profileImg} alt={`${userName}'s Profile`} />
           <UserInfo>
             <Username>{userName}</Username>
             <UserRole>Administrator</UserRole>

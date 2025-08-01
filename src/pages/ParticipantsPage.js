@@ -473,41 +473,22 @@ const TableRow = styled.div`
 const ParticipantName = styled.div`
   font-weight: 700;
   color: #1e293b;
-  display: flex;
-  align-items: center;
-  gap: 12px;
   font-family: 'Poppins', 'Inter', sans-serif;
   
   @media (max-width: 480px) {
-    gap: 8px;
+    font-size: 0.9rem;
     
-    div {
-      font-size: 0.9rem;
-      
-      div:nth-child(2) {
-        font-size: 0.75rem !important;
-      }
-      
-      div:nth-child(3) {
-        font-size: 0.7rem !important;
-      }
+    div:nth-child(2) {
+      font-size: 0.75rem !important;
+    }
+    
+    div:nth-child(3) {
+      font-size: 0.7rem !important;
     }
   }
 `;
 
-const Avatar = styled.img`
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #f1f5f9;
-  flex-shrink: 0;
-  
-  @media (max-width: 480px) {
-    width: 28px;
-    height: 28px;
-  }
-`;
+
 
 const Badge = styled.span`
   padding: 4px 8px;
@@ -866,10 +847,6 @@ const ParticipantsPage = () => {
             filteredParticipants.map((participant) => (
               <TableRow key={participant.id} onClick={() => handleViewParticipant(participant.id)}>
                 <ParticipantName>
-                  <Avatar 
-                    src={participant.photoURL || "https://i.pravatar.cc/150"} 
-                    alt={participant.username || participant.email}
-                  />
                   <div>
                     <div>{participant.username || participant.email?.split('@')[0]}</div>
                     <div style={{fontSize: '0.8rem', color: '#64748b'}}>{participant.email}</div>
