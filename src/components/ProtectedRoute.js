@@ -3,6 +3,7 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Loader from "./Loader";
+import UnauthorizedAccess from "./UnauthorizedAccess";
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, role, loading } = useAuth();
@@ -15,15 +16,9 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     return <Navigate to="/" replace />;
   }
 
-  if (!allowedRoles.includes(role)) {
-    // Redirect to the user's specific dashboard if they try to access a wrong route
-    const dashboardPath =
-      role === "admin"
-        ? "/admin"
-        : role === "superadmin"
-        ? "/superadmin"
-        : "/dashboard";
-    return <Navigate to={dashboardPath} replace />;
+  // Super admin has access to all routes
+  if (role !== "superadmin" && !allowedRoles.includes(role)) {
+    return <UnauthorizedAccess />;
   }
 
   return children;

@@ -431,10 +431,27 @@ const AdminDashboard = () => {
   const [organizationType, setOrganizationType] = useState("");
   const [error, setError] = useState("");
   const [filter, setFilter] = useState(null);
+  const [labsMap, setLabsMap] = useState(new Map());
+  const [coursesMap, setCoursesMap] = useState(new Map());
 
   const organizationId = paramOrgId || user?.organizationId;
 
   useEffect(() => {
+    // Check if user has correct role
+    if (!authLoading && !user) {
+      navigate('/', { 
+        state: { from: { pathname: '/admin' } },
+        replace: true 
+      });
+      return;
+    }
+    
+    if (!authLoading && user && role && role === "user") {
+      alert("You are not authorized to access the Admin Dashboard. You are logged in as a Student.");
+      window.location.href = '/dashboard';
+      return;
+    }
+
     const fetchAdminDashboardData = async () => {
       if (authLoading || !user || !organizationId) {
         if (!authLoading && (!user || !organizationId)) {
@@ -448,7 +465,22 @@ const AdminDashboard = () => {
       setError("");
 
       try {
-        // 1. Fetch Organization Name and Type from 'Organizations' collection
+        // 1. Fetch Labs and Courses data
+        const [labsSnap, coursesSnap] = await Promise.all([
+          getDocs(collection(db, "Labs")),
+          getDocs(collection(db, "Courses"))
+        ]);
+        
+        const labsData = new Map();
+        const coursesData = new Map();
+        
+        labsSnap.docs.forEach(doc => labsData.set(doc.id, doc.data()));
+        coursesSnap.docs.forEach(doc => coursesData.set(doc.id, doc.data()));
+        
+        setLabsMap(labsData);
+        setCoursesMap(coursesData);
+
+        // 2. Fetch Organization Name and Type from 'Organizations' collection
         const orgDocRef = doc(db, "Organizations", organizationId);
         const orgSnap = await getDoc(orgDocRef);
         if (orgSnap.exists()) {
@@ -460,7 +492,7 @@ const AdminDashboard = () => {
           setError("Organization details not found.");
         }
 
-        // 2. Fetch Participants for this Organization from the 'Users' collection (only users with role 'user')
+        // 3. Fetch Participants for this Organization from the 'Users' collection (only users with role 'user')
         const q = query(
           collection(db, "Users"), 
           where("organizationId", "==", organizationId),
@@ -486,10 +518,10 @@ const AdminDashboard = () => {
     let coursesCount = 0;
 
     participants.forEach(p => {
-      if (p.labName) {
+      if ((p.activeLabs && p.activeLabs.length > 0) || p.labName) {
         hiLabsCount++;
       }
-      if (p.courses && p.courses.length > 0) {
+      if ((p.activeCourses && p.activeCourses.length > 0) || (p.courses && p.courses.length > 0)) {
         coursesCount++;
       }
     });
@@ -503,7 +535,7 @@ const AdminDashboard = () => {
 
   const getCourseNameFromId = (courseId) => {
     const courseMap = {
-      'course_01': 'Empowering Human Intelligence – 7-Day Online Course',
+      'course_01': 'Empowering Human Intelligence–7-Day Online Course',
       'course_02': 'The 7-Day Reset: Clarity, Confidence, and Communication',
       'course_03': 'The 30-Day Foundation: Purpose-Driven Professionalism',
       'course_04': 'The 45-Day Career Rewire: Aligning Work with Self',
@@ -516,37 +548,85 @@ const AdminDashboard = () => {
   };
 
   const getUniqueLabsAndCourses = () => {
-    const uniqueLabs = new Set();
-    const uniqueCourses = new Set();
+    const labNamesMap = new Map();
+    const courseNamesMap = new Map();
+
+    const normalize = (str) => str.trim().toLowerCase().replace(/\s+/g, ' ');
 
     participants.forEach(p => {
-      if (p.labName) {
-        uniqueLabs.add(p.labName);
+      // Labs - normalize and deduplicate
+      if (p.activeLabs?.length > 0) {
+        p.activeLabs.forEach(labId => {
+          const labData = labsMap.get(labId);
+          if (labData?.labName) {
+            const normalized = normalize(labData.labName);
+            console.log('Lab from activeLabs:', labData.labName, '-> normalized:', normalized);
+            labNamesMap.set(normalized, labData.labName.trim());
+          }
+        });
       }
-      if (p.courses && p.courses.length > 0) {
+      if (p.labName) {
+        const normalized = normalize(p.labName);
+        console.log('Lab from labName:', p.labName, '-> normalized:', normalized);
+        labNamesMap.set(normalized, p.labName.trim());
+      }
+      
+      // Courses - normalize and deduplicate
+      if (p.activeCourses?.length > 0) {
+        p.activeCourses.forEach(courseId => {
+          const courseData = coursesMap.get(courseId);
+          if (courseData?.name) {
+            const normalized = normalize(courseData.name);
+            console.log('Course from activeCourses:', courseData.name, '-> normalized:', normalized);
+            courseNamesMap.set(normalized, courseData.name.trim());
+          }
+        });
+      }
+      if (p.courses?.length > 0) {
         p.courses.forEach(course => {
           const courseName = getCourseNameFromId(course);
-          uniqueCourses.add(courseName);
+          if (courseName) {
+            const normalized = normalize(courseName);
+            console.log('Course from courses array:', courseName, '-> normalized:', normalized);
+            courseNamesMap.set(normalized, courseName.trim());
+          }
         });
       }
     });
 
+    const finalLabs = [...labNamesMap.values()].filter(Boolean).sort();
+    const finalCourses = [...courseNamesMap.values()].filter(Boolean).sort();
+    
+    console.log('Final unique labs:', finalLabs);
+    console.log('Final unique courses:', finalCourses);
+
     return {
-      labs: Array.from(uniqueLabs),
-      courses: Array.from(uniqueCourses)
+      labs: finalLabs,
+      courses: finalCourses
     };
   };
 
-  const { labs, courses: uniqueCourses } = getUniqueLabsAndCourses();
+  const { labs, courses } = getUniqueLabsAndCourses();
+  
+  // Additional debug logging
+  console.log('Participants data:', participants.map(p => ({
+    id: p.id,
+    activeLabs: p.activeLabs,
+    labName: p.labName,
+    activeCourses: p.activeCourses,
+    courses: p.courses
+  })));
+  console.log('Labs map:', Array.from(labsMap.entries()));
+  console.log('Courses map:', Array.from(coursesMap.entries()));
 
-  const { total, hiLabs, courses } = getStats();
+  const { total, hiLabs, courses: coursesCount } = getStats();
 
   const filteredParticipants = participants.filter(p => {
     if (filter === 'hilabs') {
-      return p.labName;
+      return (p.activeLabs && p.activeLabs.length > 0) || p.labName;
     }
     if (filter === 'courses') {
-      return p.courses && p.courses.length > 0;
+      return (p.activeCourses && p.activeCourses.length > 0) || (p.courses && p.courses.length > 0);
     }
     return true;
   });
@@ -616,7 +696,7 @@ const AdminDashboard = () => {
                 <StatLabel>Opted for HI Labs</StatLabel>
               </StatCard>
               <StatCard onClick={() => setFilter('courses')}>
-                <StatValue>{courses}</StatValue>
+                <StatValue>{coursesCount}</StatValue>
                 <StatLabel>Opted for Courses</StatLabel>
               </StatCard>
             </StatBox>
@@ -630,7 +710,7 @@ const AdminDashboard = () => {
                   <ItemsList>
                     {labs.length > 0 ? (
                       labs.map((lab, index) => (
-                        <ItemTag key={index} type="lab">{lab}</ItemTag>
+                        <ItemTag key={`lab-${index}`} type="lab">{lab}</ItemTag>
                       ))
                     ) : (
                       <EmptyMessage>No HI Labs enrolled</EmptyMessage>
@@ -643,9 +723,9 @@ const AdminDashboard = () => {
                     Courses in Organization
                   </OverviewTitle>
                   <ItemsList>
-                    {uniqueCourses.length > 0 ? (
-                      uniqueCourses.map((course, index) => (
-                        <ItemTag key={index} type="course">{course}</ItemTag>
+                    {courses.length > 0 ? (
+                      courses.map((course, index) => (
+                        <ItemTag key={`course-${index}`} type="course">{course}</ItemTag>
                       ))
                     ) : (
                       <EmptyMessage>No courses enrolled</EmptyMessage>

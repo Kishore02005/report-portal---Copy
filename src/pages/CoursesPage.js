@@ -601,20 +601,32 @@ const CoursesPage = () => {
     console.log(`Checking enrollment for "${courseTitle}" (ID: ${courseId})`);
     
     const enrolledUsers = allUsers.filter(user => {
+      // Check new activeCourses structure
+      if (user.activeCourses && user.activeCourses.length > 0) {
+        const hasActiveMatch = user.activeCourses.some(activeCourseId => {
+          return String(activeCourseId).toLowerCase().trim() === courseId?.toLowerCase();
+        });
+        if (hasActiveMatch) {
+          console.log(`✓ User ${user.email || user.id} enrolled in ${courseTitle} (activeCourses)`);
+          return true;
+        }
+      }
+      
+      // Check legacy courses structure
       if (!user.courses) return false;
       
       let coursesArray = Array.isArray(user.courses) ? user.courses : [user.courses];
       
-      const hasMatch = coursesArray.some(course => {
+      const hasLegacyMatch = coursesArray.some(course => {
         const userCourse = String(course).toLowerCase().trim();
         return userCourse === courseId?.toLowerCase();
       });
       
-      if (hasMatch) {
-        console.log(`✓ User ${user.email || user.id} enrolled in ${courseTitle}`);
+      if (hasLegacyMatch) {
+        console.log(`✓ User ${user.email || user.id} enrolled in ${courseTitle} (legacy courses)`);
       }
       
-      return hasMatch;
+      return hasLegacyMatch;
     });
     
     console.log(`Total enrolled: ${enrolledUsers.length}`);

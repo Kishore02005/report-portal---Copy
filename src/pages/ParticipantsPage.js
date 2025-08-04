@@ -702,8 +702,8 @@ const ParticipantsPage = () => {
 
   const getStats = () => {
     const total = participants.length;
-    const hiLabs = participants.filter(p => p.labName).length;
-    const courses = participants.filter(p => p.courses && p.courses.length > 0).length;
+    const hiLabs = participants.filter(p => (p.activeLabs && p.activeLabs.length > 0) || p.labName).length;
+    const courses = participants.filter(p => (p.activeCourses && p.activeCourses.length > 0) || (p.courses && p.courses.length > 0)).length;
     const completed = participants.filter(p => p.completion >= 100).length;
 
     return { total, hiLabs, courses, completed };
@@ -716,9 +716,9 @@ const ParticipantsPage = () => {
     const matchesFilter = () => {
       switch (activeFilter) {
         case 'hilabs':
-          return participant.labName;
+          return (participant.activeLabs && participant.activeLabs.length > 0) || participant.labName;
         case 'courses':
-          return participant.courses && participant.courses.length > 0;
+          return (participant.activeCourses && participant.activeCourses.length > 0) || (participant.courses && participant.courses.length > 0);
         case 'completed':
           return participant.completion >= 100;
         default:
@@ -857,11 +857,17 @@ const ParticipantsPage = () => {
                     )}
                   </div>
                 </ParticipantName>
-                <div className="desktop-only">{participant.labName || participant.courses?.[0] || "Not enrolled"}</div>
+                <div className="desktop-only">
+                  {participant.activeLabs?.length > 0 ? `${participant.activeLabs.length} Active Labs` :
+                   participant.activeCourses?.length > 0 ? `${participant.activeCourses.length} Active Courses` :
+                   participant.labName || participant.courses?.[0] || "Not enrolled"}
+                </div>
                 <div className="desktop-only">{participant.completion || 0}%</div>
                 <div className="desktop-only">
-                  <Badge type={participant.completion >= 100 ? 'completed' : participant.labName ? 'active' : 'inactive'}>
-                    {participant.completion >= 100 ? 'Completed' : participant.labName ? 'Active' : 'Inactive'}
+                  <Badge type={participant.completion >= 100 ? 'completed' : 
+                              (participant.activeLabs?.length > 0 || participant.activeCourses?.length > 0 || participant.labName) ? 'active' : 'inactive'}>
+                    {participant.completion >= 100 ? 'Completed' : 
+                     (participant.activeLabs?.length > 0 || participant.activeCourses?.length > 0 || participant.labName) ? 'Active' : 'Inactive'}
                   </Badge>
                 </div>
                 <div className="desktop-only">
@@ -874,14 +880,20 @@ const ParticipantsPage = () => {
                     <div style={{display: 'grid', gridTemplateColumns: '1fr auto', gap: '12px', alignItems: 'start'}}>
                       <div style={{minWidth: 0}}>
                         <div style={{fontSize: '0.8rem', color: '#64748b', marginBottom: '4px'}}>
-                          <strong>Lab/Course:</strong> {participant.labName || participant.courses?.[0] || "Not enrolled"}
+                          <strong>Lab/Course:</strong> {
+                            participant.activeLabs?.length > 0 ? `${participant.activeLabs.length} Active Labs` :
+                            participant.activeCourses?.length > 0 ? `${participant.activeCourses.length} Active Courses` :
+                            participant.labName || participant.courses?.[0] || "Not enrolled"
+                          }
                         </div>
                         <div style={{fontSize: '0.8rem', color: '#64748b', marginBottom: '4px'}}>
                           <strong>Progress:</strong> {participant.completion || 0}%
                         </div>
                         <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px'}}>
-                          <Badge type={participant.completion >= 100 ? 'completed' : participant.labName ? 'active' : 'inactive'}>
-                            {participant.completion >= 100 ? 'Completed' : participant.labName ? 'Active' : 'Inactive'}
+                          <Badge type={participant.completion >= 100 ? 'completed' : 
+                                      (participant.activeLabs?.length > 0 || participant.activeCourses?.length > 0 || participant.labName) ? 'active' : 'inactive'}>
+                            {participant.completion >= 100 ? 'Completed' : 
+                             (participant.activeLabs?.length > 0 || participant.activeCourses?.length > 0 || participant.labName) ? 'Active' : 'Inactive'}
                           </Badge>
                         </div>
                       </div>

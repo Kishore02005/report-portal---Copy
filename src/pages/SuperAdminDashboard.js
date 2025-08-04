@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebaseConfig";
+import { auth, db } from "../firebaseConfig";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
@@ -250,7 +250,66 @@ const TrendLabel = styled.div`
   font-weight: 500;
 `;
 
+const MetricsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+`;
 
+const MetricCard = styled.div`
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: ${props => props.accentColor};
+  }
+`;
+
+const MetricHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+`;
+
+const MetricTitle = styled.h4`
+  font-size: 1rem;
+  color: #64748b;
+  margin: 0;
+  font-weight: 500;
+`;
+
+const MetricIcon = styled.div`
+  font-size: 1.5rem;
+  opacity: 0.7;
+`;
+
+const MetricValue = styled.div`
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+`;
+
+const MetricChange = styled.div`
+  font-size: 0.85rem;
+  color: ${props => props.positive ? '#10b981' : '#ef4444'};
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
 
 const SectionTitle = styled.h2`
   font-size: 1.5rem;
@@ -401,7 +460,63 @@ const OrgCountLabel = styled.div`
   letter-spacing: 0.025em;
 `;
 
+const CardGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+`;
 
+const OrgCard = styled.div`
+  background: linear-gradient(145deg, #ffffff, #f9f9f9);
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e2e8f0;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  }
+`;
+
+const OrgTitle = styled.h4`
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+  color: #2c5282;
+  font-weight: 700;
+`;
+
+const Detail = styled.p`
+  font-size: 1rem;
+  margin: 8px 0;
+  color: #4a5568;
+  line-height: 1.5;
+`;
+
+const ServiceList = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+`;
+
+const ServiceItem = styled.span`
+  background-color: #e2e8f0;
+  color: #4a5568;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+`;
+
+const NoServiceItem = styled.em`
+  color: #718096;
+  font-size: 0.9rem;
+`;
 
 const ErrorText = styled.p`
   color: #d32f2f;
@@ -410,10 +525,23 @@ const ErrorText = styled.p`
   font-size: 1rem;
 `;
 
+const LogoutButton = styled.button`
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.3s;
 
+  &:hover {
+    background-color: #d32f2f;
+  }
+`;
 
 const SuperAdminDashboard = () => {
-
+  const [orgData, setOrgData] = useState([]);
   const [stats, setStats] = useState({
     totalParticipants: 0,
     hiLabParticipants: 0,
@@ -456,7 +584,7 @@ const SuperAdminDashboard = () => {
             name: org.name || "N/A",
             type: org.type || "N/A",
             participantsCount: participants.length,
-            joinedDate: org.joinedOn || org.joinedDate || "N/A",
+            joinedDate: org.joinedDate || "N/A",
             hasHILab: org.hasHILab || false,
             hasCourses: org.hasCourses || false,
             hasWorkshops: org.hasWorkshops || false,
@@ -466,8 +594,8 @@ const SuperAdminDashboard = () => {
 
         // Calculate overall stats
         const totalParticipants = allUsers.length;
-        const hiLabParticipants = allUsers.filter(user => user.labName).length;
-        const courseParticipants = allUsers.filter(user => user.courses && user.courses.length > 0).length;
+        const hiLabParticipants = allUsers.filter(user => (user.activeLabs && user.activeLabs.length > 0) || user.labName).length;
+        const courseParticipants = allUsers.filter(user => (user.activeCourses && user.activeCourses.length > 0) || (user.courses && user.courses.length > 0)).length;
         const totalOrganizations = result.length;
 
         setStats({
@@ -493,14 +621,14 @@ const SuperAdminDashboard = () => {
           
           if (categoryKey && newCategoryStats[categoryKey]) {
             newCategoryStats[categoryKey].total += org.participantsCount;
-            newCategoryStats[categoryKey].hiLab += org.participants.filter(p => p.labName).length;
-            newCategoryStats[categoryKey].courses += org.participants.filter(p => p.courses && p.courses.length > 0).length;
+            newCategoryStats[categoryKey].hiLab += org.participants.filter(p => (p.activeLabs && p.activeLabs.length > 0) || p.labName).length;
+            newCategoryStats[categoryKey].courses += org.participants.filter(p => (p.activeCourses && p.activeCourses.length > 0) || (p.courses && p.courses.length > 0)).length;
             newCategoryStats[categoryKey].orgCount += 1;
           }
         });
 
         setCategoryStats(newCategoryStats);
-
+        setOrgData(result);
       } catch (err) {
         console.error("Error fetching data for Super Admin Dashboard:", err);
         setError("Failed to load dashboard data. Please try again.");
@@ -512,7 +640,9 @@ const SuperAdminDashboard = () => {
     fetchData();
   }, []);
 
-
+  const handleClick = (orgId) => {
+    navigate(`/admin/${orgId}`);
+  };
 
   const handleCategoryClick = (category) => {
     navigate(`/participants?category=${category}`);
@@ -560,44 +690,64 @@ const SuperAdminDashboard = () => {
             </StatsGrid>
             
             <CategorySection>
-              <SectionTitle>🏢 Organizations by Category</SectionTitle>
-              <StatsGrid>
+              <SectionTitle>Organizations by Category</SectionTitle>
+              <CategoryGrid>
                 <OrgCountCard 
                   accentColor="#3b82f6" 
                   onClick={() => navigate('/organizations/school')}
                 >
-                  <OrgCountIcon bgColor="rgba(59, 130, 246, 0.1)">🏫</OrgCountIcon>
+                  <OrgCountIcon bgColor="linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)">
+                    🏫
+                  </OrgCountIcon>
                   <OrgCountValue>{categoryStats.schools.orgCount}</OrgCountValue>
                   <OrgCountLabel>Schools</OrgCountLabel>
+                  <div style={{fontSize: '0.8rem', color: '#64748b', marginTop: '8px'}}>
+                    {categoryStats.schools.total} participants
+                  </div>
                 </OrgCountCard>
                 
                 <OrgCountCard 
                   accentColor="#10b981" 
                   onClick={() => navigate('/organizations/college')}
                 >
-                  <OrgCountIcon bgColor="rgba(16, 185, 129, 0.1)">🎓</OrgCountIcon>
+                  <OrgCountIcon bgColor="linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)">
+                    🎓
+                  </OrgCountIcon>
                   <OrgCountValue>{categoryStats.colleges.orgCount}</OrgCountValue>
                   <OrgCountLabel>Colleges</OrgCountLabel>
+                  <div style={{fontSize: '0.8rem', color: '#64748b', marginTop: '8px'}}>
+                    {categoryStats.colleges.total} participants
+                  </div>
                 </OrgCountCard>
                 
                 <OrgCountCard 
                   accentColor="#f59e0b" 
                   onClick={() => navigate('/organizations/corporate')}
                 >
-                  <OrgCountIcon bgColor="rgba(245, 158, 11, 0.1)">🏢</OrgCountIcon>
+                  <OrgCountIcon bgColor="linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)">
+                    🏢
+                  </OrgCountIcon>
                   <OrgCountValue>{categoryStats.corporates.orgCount}</OrgCountValue>
                   <OrgCountLabel>Corporates</OrgCountLabel>
+                  <div style={{fontSize: '0.8rem', color: '#64748b', marginTop: '8px'}}>
+                    {categoryStats.corporates.total} participants
+                  </div>
                 </OrgCountCard>
                 
                 <OrgCountCard 
                   accentColor="#8b5cf6" 
                   onClick={() => navigate('/organizations/individual')}
                 >
-                  <OrgCountIcon bgColor="rgba(139, 92, 246, 0.1)">👤</OrgCountIcon>
+                  <OrgCountIcon bgColor="linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)">
+                    👤
+                  </OrgCountIcon>
                   <OrgCountValue>{categoryStats.individuals.orgCount}</OrgCountValue>
                   <OrgCountLabel>Individuals</OrgCountLabel>
+                  <div style={{fontSize: '0.8rem', color: '#64748b', marginTop: '8px'}}>
+                    {categoryStats.individuals.total} participants
+                  </div>
                 </OrgCountCard>
-              </StatsGrid>
+              </CategoryGrid>
             </CategorySection>
             
             <AnalyticsSection>

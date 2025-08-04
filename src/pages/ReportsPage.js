@@ -1,14 +1,27 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import styled from "styled-components";
+import AdminSidebar from "../components/AdminSidebar";
+import SuperAdminSidebar from "../components/SuperAdminSidebar";
+
+const PageContainer = styled.div`
+  display: flex;
+  min-height: 100vh;
+  background: #f8fafc;
+  margin-left: 250px;
+  
+  @media (max-width: 768px) {
+    margin-left: 0;
+  }
+`;
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  background: #f8fafc;
+  flex: 1;
   padding: 40px;
   text-align: center;
 `;
@@ -34,7 +47,7 @@ const Message = styled.p`
 `;
 
 const BackButton = styled.button`
-  background: #3b82f6;
+  background: #6b7280;
   color: white;
   font-weight: 600;
   padding: 12px 24px;
@@ -43,26 +56,39 @@ const BackButton = styled.button`
   font-size: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
   &:hover {
-    background: #2563eb;
+    background: #4b5563;
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 8px 20px rgba(107, 114, 128, 0.3);
   }
 `;
 
 const ReportsPage = () => {
   const navigate = useNavigate();
+  const { role } = useAuth();
+
+  const renderSidebar = () => {
+    if (role === 'superadmin') return <SuperAdminSidebar />;
+    if (role === 'admin') return <AdminSidebar />;
+    return null;
+  };
 
   return (
-    <Container>
-      <ConstructionIcon>🚧</ConstructionIcon>
-      <Title>Reports Page</Title>
-      <Message>
-        This page is currently under construction. We're working hard to bring you comprehensive reporting features soon!
-      </Message>
-      <BackButton onClick={() => navigate(-1)}>Go Back</BackButton>
-    </Container>
+    <PageContainer>
+      {renderSidebar()}
+      <Container>
+        <ConstructionIcon>🚧</ConstructionIcon>
+        <Title>Reports Page</Title>
+        <Message>
+          This page is currently under construction. We're working hard to bring you comprehensive reporting features soon!
+        </Message>
+        <BackButton onClick={() => navigate(-1)}>← Back</BackButton>
+      </Container>
+    </PageContainer>
   );
 };
 

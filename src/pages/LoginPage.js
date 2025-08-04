@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebaseConfig";
@@ -169,23 +169,42 @@ const RoleSelect = styled.select`
   border: 1px solid rgba(59, 130, 246, 0.2);
   border-radius: 12px;
   font-size: 15px;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  background: white;
   outline: none;
   margin-top: 24px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
   background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%233b82f6%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.2-6.4H18.4c-5%200-9.3%201.8-13.2%206.4-3.9%204.5-5.9%209.7-5.9%2015.6s2%2011.1%205.9%2015.6l128%20127.9c3.9%203.9%209.1%205.8%2014.3%205.8s10.4-1.9%2014.3-5.8L287%20100.6c3.9-4.5%205.9-9.7%205.9-15.6s-2-11.1-5.9-15.6z%22%2F%3E%3C%2Fsvg%3E');
   background-repeat: no-repeat;
   background-position: right 18px center;
   background-size: 14px;
   cursor: pointer;
   font-family: inherit;
+  
+  @media (max-width: 768px) {
+    padding: 20px 24px;
+    font-size: 16px;
+    min-height: 60px;
+    border-width: 2px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.1);
+    background-size: 18px;
+    background-position: right 24px center;
+    background-color: white !important;
+  }
 
   &:hover {
     border-color: #3b82f6;
     background: #ffffff;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+    
+    @media (max-width: 768px) {
+      transform: none;
+      border-color: #3b82f6;
+    }
   }
 
   &:focus {
@@ -193,6 +212,21 @@ const RoleSelect = styled.select`
     background: #ffffff;
     transform: translateY(-2px);
     box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1), 0 8px 25px rgba(59, 130, 246, 0.15);
+    
+    @media (max-width: 768px) {
+      transform: none;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+      border-color: #3b82f6;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    option {
+      padding: 12px;
+      font-size: 16px;
+      background: white;
+      color: #1e293b;
+    }
   }
 `;
 
@@ -275,7 +309,22 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user: authUser, role: authRole, authError, setAuthError } = useAuth();
+
+  // Check for unauthorized access attempts
+  useEffect(() => {
+    const unauthorizedRoutes = {
+      '/dashboard': 'Student Dashboard',
+      '/admin': 'Admin Dashboard', 
+      '/superadmin': 'Super Admin Dashboard'
+    };
+    
+    const attemptedRoute = location.state?.from?.pathname;
+    if (attemptedRoute && unauthorizedRoutes[attemptedRoute]) {
+      setError(`Access denied: You attempted to access the ${unauthorizedRoutes[attemptedRoute]} without proper authorization. Please login with the correct role.`);
+    }
+  }, [location]);
 
   // Redirect if already logged in and role is determined by AuthContext
   React.useEffect(() => {
@@ -315,8 +364,26 @@ const LoginPage = () => {
     }
     setIsLoggingIn(true);
 
-    if (!email || !password || !selectedRole) {
-      setError("Please enter email, password, and select a role.");
+    if (!email && !password && !selectedRole) {
+      setError("Please fill in all fields: email, password, and select your role.");
+      setIsLoggingIn(false);
+      return;
+    }
+    
+    if (!email) {
+      setError("Please enter your email address.");
+      setIsLoggingIn(false);
+      return;
+    }
+    
+    if (!password) {
+      setError("Please enter your password.");
+      setIsLoggingIn(false);
+      return;
+    }
+    
+    if (!selectedRole) {
+      setError("Please select your role from the dropdown.");
       setIsLoggingIn(false);
       return;
     }
@@ -336,19 +403,32 @@ const LoginPage = () => {
       }
 
       if (!foundRole) {
-        setError("Your account is not configured with a role. Please contact support.");
+        setError("Your account setup is incomplete. No role has been assigned to your account. Please contact support to complete your account setup.");
         await auth.signOut();
         return;
       }
 
+      // ------------------ CORRECTED BLOCK START ------------------
       if (foundRole !== selectedRole) {
-        if (setAuthError) {
-          setAuthError(`Permission Denied: You are registered as a '${foundRole}'. Please log in with the correct role.`);
-        }
+        const roleMessages = {
+          user: "Student",
+          admin: "Administrator",
+          superadmin: "Super Administrator"
+        };
+        const userRoleDisplay = roleMessages[foundRole] || foundRole;
+        const selectedRoleDisplay = roleMessages[selectedRole] || selectedRole;
+        
+        // 1. Prepare the error message string first.
+        const errorMessage = `Access Denied: Your account is registered as '${userRoleDisplay}', but you're trying to login as '${selectedRoleDisplay}'. Please select the correct role that matches your account.`;
+        
+        // 2. Sign the user out and wait for it to complete.
         await auth.signOut();
-        setIsLoggingIn(false);
+
+        // 3. NOW, set the error state. This will reliably trigger a re-render with the message.
+        setError(errorMessage);
         return;
       }
+      // ------------------ CORRECTED BLOCK END ------------------
 
       switch (foundRole) {
         case "admin":
@@ -367,12 +447,20 @@ const LoginPage = () => {
 
     } catch (err) {
       console.error("Login failed:", err);
-      if (err.code === "auth/invalid-email" || err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
-        setError("Invalid email or password.");
+      if (err.code === "auth/invalid-email") {
+        setError("Please enter a valid email address.");
+      } else if (err.code === "auth/user-not-found") {
+        setError("No account found with this email address. Please check your email or contact support.");
+      } else if (err.code === "auth/wrong-password") {
+        setError("Incorrect password. Please check your password and try again.");
+      } else if (err.code === "auth/invalid-credential") {
+        setError("Invalid email or password. Please check your credentials.");
       } else if (err.code === "auth/too-many-requests") {
-        setError("Too many login attempts. Please try again later.");
+        setError("Too many failed login attempts. Please wait a few minutes before trying again.");
+      } else if (err.code === "auth/user-disabled") {
+        setError("This account has been disabled. Please contact support for assistance.");
       } else {
-        setError("Login failed. Please check your credentials.");
+        setError("Login failed. Please check your email and password, then try again.");
       }
     } finally {
       setIsLoggingIn(false);
@@ -442,8 +530,7 @@ const LoginPage = () => {
           <option value="superadmin">Superadmin</option>
         </RoleSelect>
 
-        {error && <Error>{error}</Error>}
-        {authError && <Error>{authError}</Error>}
+        {(error || authError) && <Error>{error || authError}</Error>}
 
         <LoginButton onClick={handleLogin} disabled={isLoggingIn || !email || !password || !selectedRole}>
           {loginButtonText}

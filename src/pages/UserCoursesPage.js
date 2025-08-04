@@ -1,17 +1,31 @@
 // src/pages/UserCoursesPage.js
 import React, { useEffect, useState } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { db } from "../firebaseConfig";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 import Loader from "../components/Loader";
 import UserNavbar from "../components/UserNavbar";
+import { FiBook, FiClock, FiTag, FiCheckCircle, FiXCircle, FiTrendingUp, FiAward } from 'react-icons/fi';
+
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
+
+const slideIn = keyframes`
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+`;
 
 const PageContainer = styled.div`
   min-height: 100vh;
-  background: #f8fafc;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-  padding-top: 70px;
+  background: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  padding: 70px 0 0 0;
+  margin: 0;
+  position: relative;
+  color: #1e293b;
   
   @media (max-width: 768px) {
     padding-top: 60px;
@@ -21,189 +35,403 @@ const PageContainer = styled.div`
 const ContentWrapper = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2.5rem 1.875rem;
+  padding: 2.5rem 1.875rem 3rem 1.875rem;
   text-align: center;
+  position: relative;
+  z-index: 1;
+  animation: ${fadeIn} 0.8s ease-out;
   
   @media (max-width: 1024px) {
     max-width: 1000px;
-    padding: 2rem 1.5rem;
+    padding: 2rem 1.5rem 2.5rem 1.5rem;
   }
   
   @media (max-width: 768px) {
-    padding: 1.5rem 1rem;
+    padding: 1.5rem 1rem 2rem 1rem;
     max-width: 100%;
   }
   
   @media (max-width: 480px) {
-    padding: 1rem 0.75rem;
+    padding: 1rem 0.75rem 1.5rem 0.75rem;
   }
 `;
 
+const HeaderSection = styled.div`
+  text-align: center;
+  margin-bottom: 3rem;
+  animation: ${slideIn} 0.8s ease-out;
+`;
+
 const Title = styled.h2`
-  font-size: 2.5rem;
-  color: #1e293b;
-  margin-bottom: 2.5rem;
+  font-size: 2.75rem;
+  color: #0f172a;
+  margin-bottom: 1rem;
   text-align: center;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  
+  svg {
+    color: #3b82f6;
+  }
   
   @media (max-width: 768px) {
-    font-size: 2rem;
-    margin-bottom: 2rem;
+    font-size: 2.25rem;
+    margin-bottom: 0.75rem;
   }
   
   @media (max-width: 480px) {
+    font-size: 1.875rem;
+    margin-bottom: 0.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+`;
+
+const Subtitle = styled.p`
+  font-size: 1.125rem;
+  color: #64748b;
+  margin: 0 auto;
+  max-width: 600px;
+  line-height: 1.6;
+  font-weight: 400;
+  
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+  }
+`;
+
+const StatsBar = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 2rem 0;
+  
+  @media (max-width: 768px) {
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+`;
+
+const StatItem = styled.div`
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  text-align: center;
+  
+  h3 {
     font-size: 1.75rem;
-    margin-bottom: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    color: #3b82f6;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  p {
+    font-size: 0.875rem;
+    margin: 0.25rem 0 0 0;
+    color: #64748b;
+    font-weight: 500;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 0.75rem 1rem;
+    
+    h3 {
+      font-size: 1.5rem;
+    }
+    
+    p {
+      font-size: 0.8rem;
+    }
   }
 `;
 
 const CourseGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
   justify-content: center;
   
   @media (max-width: 768px) {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
   }
   
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 1.25rem;
   }
 `;
 
 const CourseCard = styled.div`
   background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: ${fadeIn} 0.6s ease-out;
+  animation-delay: ${props => props.index * 0.1}s;
+  animation-fill-mode: both;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  }
+  
+  &:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
+  }
   
   @media (max-width: 768px) {
+    padding: 1.5rem;
+    border-radius: 12px;
+    
+    &:hover {
+      transform: translateY(-4px) scale(1.01);
+    }
+  }
+  
+  @media (max-width: 480px) {
     padding: 1.25rem;
     border-radius: 10px;
   }
-  
-  @media (max-width: 480px) {
-    padding: 1rem;
-    border-radius: 8px;
-  }
+`;
+
+const CourseHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  width: 100%;
+`;
+
+const CourseIcon = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.25rem;
+  flex-shrink: 0;
 `;
 
 const CourseName = styled.h3`
-  font-size: 1.3rem;
-  color: #1e293b;
-  margin-bottom: 1rem;
-  font-weight: 700;
+  font-size: 1.25rem;
+  color: #0f172a;
+  margin: 0;
+  font-weight: 600;
   line-height: 1.3;
-  width: 100%;
-  text-align: left;
+  flex: 1;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.01em;
   
   @media (max-width: 768px) {
-    font-size: 1.2rem;
-    margin-bottom: 0.875rem;
+    font-size: 1.125rem;
   }
   
   @media (max-width: 480px) {
-    font-size: 1.125rem;
-    margin-bottom: 0.75rem;
+    font-size: 1rem;
   }
+`;
+
+const CourseDetailsGrid = styled.div`
+  display: grid;
+  gap: 0.75rem;
+  width: 100%;
 `;
 
 const CourseDetail = styled.div`
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  width: 100%;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #f1f5f9;
-  font-size: 0.95rem;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  transition: all 0.2s ease;
   
-  &:last-child {
-    border-bottom: none;
+  &:hover {
+    background: #e2e8f0;
+    transform: translateX(4px);
+  }
+  
+  svg {
+    color: #3b82f6;
+    flex-shrink: 0;
   }
   
   @media (max-width: 480px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-    padding: 0.75rem 0;
-    font-size: 0.9rem;
+    padding: 0.625rem;
+    gap: 0.5rem;
   }
 `;
 
 const CourseLabel = styled.span`
   color: #64748b;
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
+  flex: 1;
+  font-family: 'Inter', sans-serif;
   
   @media (max-width: 480px) {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
 `;
 
 const CourseValue = styled.span`
-  color: #1e293b;
+  color: #0f172a;
   font-weight: 600;
   background: #f1f5f9;
-  padding: 0.25rem 0.75rem;
+  padding: 0.375rem 0.75rem;
   border-radius: 6px;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
+  border: 1px solid #e2e8f0;
+  font-family: 'Inter', sans-serif;
   
   @media (max-width: 480px) {
-    font-size: 0.9rem;
-    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
   }
 `;
 
-const ErrorText = styled.p`
-  color: #dc2626;
+const StatusBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  
+  ${props => props.active ? `
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+  ` : `
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+  `}
+  
+  svg {
+    font-size: 0.875rem;
+  }
+`;
+
+const ErrorText = styled.div`
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 16px;
+  padding: 2rem;
   text-align: center;
   margin-top: 2rem;
-  font-size: 1.125rem;
-  background: #fef2f2;
-  padding: 1.25rem;
-  border-radius: 8px;
-  border: 1px solid #fecaca;
-  line-height: 1.5;
   
-  @media (max-width: 768px) {
-    font-size: 1rem;
-    padding: 1rem;
+  h3 {
+    color: #dc2626;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    font-family: 'Inter', sans-serif;
   }
   
-  @media (max-width: 480px) {
-    font-size: 0.9rem;
-    margin-top: 1.5rem;
+  p {
+    color: #64748b;
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.5;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    
+    h3 {
+      font-size: 1.125rem;
+    }
+    
+    p {
+      font-size: 0.9rem;
+    }
   }
 `;
 
-const Placeholder = styled.div`
-  padding: 3.75rem 2.5rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+const EmptyState = styled.div`
+  background: #f8fafc;
   border: 1px solid #e2e8f0;
-  color: #64748b;
-  font-size: 1.125rem;
+  border-radius: 20px;
+  padding: 4rem 2.5rem;
   text-align: center;
-  line-height: 1.6;
+  margin-top: 2rem;
+  
+  svg {
+    font-size: 4rem;
+    color: #cbd5e1;
+    margin-bottom: 1.5rem;
+  }
+  
+  h3 {
+    font-size: 1.5rem;
+    color: #0f172a;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  p {
+    color: #64748b;
+    font-size: 1.125rem;
+    margin: 0;
+    line-height: 1.6;
+    max-width: 400px;
+    margin: 0 auto;
+    font-family: 'Inter', sans-serif;
+  }
   
   @media (max-width: 768px) {
     padding: 3rem 2rem;
-    font-size: 1rem;
+    
+    svg {
+      font-size: 3rem;
+    }
+    
+    h3 {
+      font-size: 1.25rem;
+    }
+    
+    p {
+      font-size: 1rem;
+    }
   }
   
   @media (max-width: 480px) {
     padding: 2.5rem 1.5rem;
-    font-size: 0.9rem;
-    border-radius: 8px;
+    border-radius: 16px;
   }
 `;
 
@@ -232,6 +460,7 @@ const UserCoursesPage = () => {
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
           const enrolledCourseIds = userData.courses || [];
+          const activeCourseIds = userData.activeCourses || [];
 
           if (enrolledCourseIds.length > 0) {
             const coursesRef = collection(db, "Courses");
@@ -242,7 +471,12 @@ const UserCoursesPage = () => {
             const detailedCourses = enrolledCourseIds
               .map(courseId => {
                 const courseDetails = allCoursesMap.get(courseId);
-                return courseDetails ? { id: courseId, ...courseDetails } : null;
+                const isActive = activeCourseIds.includes(courseId);
+                return courseDetails ? { 
+                  id: courseId, 
+                  ...courseDetails, 
+                  status: isActive ? 'Active' : 'Completed'
+                } : null;
               })
               .filter(course => course !== null);
 
@@ -275,32 +509,69 @@ const UserCoursesPage = () => {
         {authLoading || pageLoading ? (
           <Loader />
         ) : error ? (
-          <ErrorText>{error}</ErrorText>
+          <ErrorText>
+            <h3>Oops! Something went wrong</h3>
+            <p>{error}</p>
+          </ErrorText>
         ) : userCourses.length > 0 ? (
           <>
-            <Title>Your Enrolled Courses</Title>
+            <HeaderSection>
+              <Title>
+                <FiBook />
+                Your Learning Journey
+              </Title>
+              <Subtitle>
+                Track your progress and continue building your skills with these enrolled courses
+              </Subtitle>
+              <StatsBar>
+                <StatItem>
+                  <h3>{userCourses.length}</h3>
+                  <p>Enrolled Courses</p>
+                </StatItem>
+                <StatItem>
+                  <h3>{userCourses.filter(c => c.status === 'Active').length}</h3>
+                  <p>Active Courses</p>
+                </StatItem>
+                <StatItem>
+                  <h3>{userCourses.filter(c => c.status === 'Completed').length}</h3>
+                  <p>Completed</p>
+                </StatItem>
+              </StatsBar>
+            </HeaderSection>
             <CourseGrid>
-              {userCourses.map((course) => (
-                <CourseCard key={course.id}>
-                  <CourseName>{course.name || "N/A"}</CourseName>
-                  <CourseDetail>
-                    <CourseLabel>Category:</CourseLabel>
-                    <CourseValue>{course.category || "N/A"}</CourseValue>
-                  </CourseDetail>
-                  <CourseDetail>
-                    <CourseLabel>Duration:</CourseLabel>
-                    <CourseValue>{course.duration || "N/A"}</CourseValue>
-                  </CourseDetail>
-                  <CourseDetail>
-                    <CourseLabel>Status:</CourseLabel>
-                    <CourseValue>{course.active ? "Active" : "Inactive"}</CourseValue>
-                  </CourseDetail>
+              {userCourses.map((course, index) => (
+                <CourseCard key={course.id} index={index}>
+                  <CourseHeader>
+                    <CourseIcon>
+                      <FiBook />
+                    </CourseIcon>
+                    <CourseName>{course.name || "Course Name"}</CourseName>
+                  </CourseHeader>
+                  <CourseDetailsGrid>
+                    <CourseDetail>
+                      <FiClock />
+                      <CourseLabel>Duration</CourseLabel>
+                      <CourseValue>{course.duration || "Self-paced"}</CourseValue>
+                    </CourseDetail>
+                    <CourseDetail>
+                      <FiTrendingUp />
+                      <CourseLabel>Status</CourseLabel>
+                      <StatusBadge active={course.status === 'Active'}>
+                        {course.status === 'Active' ? <FiCheckCircle /> : <FiXCircle />}
+                        {course.status || "Inactive"}
+                      </StatusBadge>
+                    </CourseDetail>
+                  </CourseDetailsGrid>
                 </CourseCard>
               ))}
             </CourseGrid>
           </>
         ) : (
-          <Placeholder>You are not currently enrolled in any courses.</Placeholder>
+          <EmptyState>
+            <FiAward />
+            <h3>No Courses Yet</h3>
+            <p>Start your learning journey by enrolling in courses that match your interests and goals.</p>
+          </EmptyState>
         )}
       </ContentWrapper>
     </PageContainer>

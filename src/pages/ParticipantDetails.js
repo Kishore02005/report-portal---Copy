@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import styled from "styled-components";
 import Loader from "../components/Loader";
@@ -19,7 +19,7 @@ const PageContainer = styled.div`
 
 const ContentWrapper = styled.div`
   flex: 1;
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
   
@@ -134,43 +134,47 @@ const UserEmail = styled.p`
   text-align: center;
 `;
 
-const ActionLink = styled.a`
+const ActionLink = styled.button`
   color: #3b82f6;
-  text-decoration: none;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
   font-weight: 500;
   font-size: 0.9rem;
   padding: 0.25rem 0.75rem;
-  background: #eff6ff;
   border-radius: 6px;
+  cursor: pointer;
   transition: all 0.2s ease;
   
   &:hover {
     background: #dbeafe;
-    text-decoration: none;
+    color: #1d4ed8;
   }
 `;
 
 const BackButton = styled.button`
   margin-top: 2rem;
-  background: #3b82f6;
+  background: #6b7280;
   color: white;
   border: none;
   border-radius: 8px;
   padding: 0.75rem 1.5rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
   font-size: 0.9rem;
-  width: 100%;
-  max-width: 200px;
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 
   &:hover {
-    background: #2563eb;
+    background: #4b5563;
+    transform: translateX(-2px);
   }
   
   @media (max-width: 768px) {
     margin-top: 1.5rem;
-    max-width: 100%;
+    align-self: stretch;
   }
   
   @media (max-width: 480px) {
@@ -196,6 +200,8 @@ const ParticipantDetails = () => {
   const location = useLocation();
   const [userData, setUserData] = useState(null);
   const [organizationName, setOrganizationName] = useState("");
+  const [activeLabs, setActiveLabs] = useState([]);
+  const [activeCourses, setActiveCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -217,6 +223,40 @@ const ParticipantDetails = () => {
         if (userDocSnap.exists()) {
           const data = { id: userDocSnap.id, ...userDocSnap.data() };
           setUserData(data);
+          
+          // Fetch active labs details
+          if (data.activeLabs && data.activeLabs.length > 0) {
+            const labsRef = collection(db, "Labs");
+            const allLabsSnap = await getDocs(labsRef);
+            const allLabsMap = new Map();
+            allLabsSnap.docs.forEach(d => allLabsMap.set(d.id, d.data()));
+            
+            const activeLabsDetails = data.activeLabs
+              .map(labId => {
+                const labDetails = allLabsMap.get(labId);
+                return labDetails ? { id: labId, name: labDetails.labName } : null;
+              })
+              .filter(lab => lab !== null);
+            
+            setActiveLabs(activeLabsDetails);
+          }
+          
+          // Fetch active courses details
+          if (data.activeCourses && data.activeCourses.length > 0) {
+            const coursesRef = collection(db, "Courses");
+            const allCoursesSnap = await getDocs(coursesRef);
+            const allCoursesMap = new Map();
+            allCoursesSnap.docs.forEach(d => allCoursesMap.set(d.id, d.data()));
+            
+            const activeCoursesDetails = data.activeCourses
+              .map(courseId => {
+                const courseDetails = allCoursesMap.get(courseId);
+                return courseDetails ? { id: courseId, name: courseDetails.name } : null;
+              })
+              .filter(course => course !== null);
+            
+            setActiveCourses(activeCoursesDetails);
+          }
           
           // Fetch organization name if organizationId exists
           if (data.organizationId && data.organizationId !== "Independent") {
@@ -273,10 +313,24 @@ const ParticipantDetails = () => {
               <FieldLabel>Organization:</FieldLabel>
               <FieldValue>{organizationName || "Independent"}</FieldValue>
             </Field>
-            <Field>
-              <FieldLabel>Enrolled In:</FieldLabel>
-              <FieldValue>{userData.labName || "N/A"}</FieldValue>
-            </Field>
+            {activeCourses.length > 0 && (
+              <Field>
+                <FieldLabel>Active Courses:</FieldLabel>
+                <FieldValue>{activeCourses.map(course => course.name).join(', ')}</FieldValue>
+              </Field>
+            )}
+            {activeLabs.length > 0 && (
+              <Field>
+                <FieldLabel>Active Labs:</FieldLabel>
+                <FieldValue>{activeLabs.map(lab => lab.name).join(', ')}</FieldValue>
+              </Field>
+            )}
+            {userData.labName && (
+              <Field>
+                <FieldLabel>Legacy Lab:</FieldLabel>
+                <FieldValue>{userData.labName}</FieldValue>
+              </Field>
+            )}
             <Field>
               <FieldLabel>Enrollment Date:</FieldLabel>
               <FieldValue>{userData.enrolment ? new Date(userData.enrolment).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : "N/A"}</FieldValue>
@@ -287,14 +341,14 @@ const ParticipantDetails = () => {
             </Field>
             {userData.courses && userData.courses.length > 0 && (
               <Field>
-                <FieldLabel>Courses:</FieldLabel>
+                <FieldLabel>Legacy Courses:</FieldLabel>
                 <FieldValue>{userData.courses.length} enrolled</FieldValue>
               </Field>
             )}
             {userData.reportUrl && (
               <Field>
                 <FieldLabel>Report:</FieldLabel>
-                <ActionLink href={userData.reportUrl} target="_blank" rel="noopener noreferrer">
+                <ActionLink onClick={() => window.open(userData.reportUrl, '_blank')}>
                   View Report
                 </ActionLink>
               </Field>
@@ -302,17 +356,15 @@ const ParticipantDetails = () => {
             {userData.certificates && userData.certificates.length > 0 && (
               <Field>
                 <FieldLabel>Achievements:</FieldLabel>
-                <ActionLink 
-                  href={`/achievements/${userData.email}`} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                >
+                <ActionLink onClick={() => navigate(`/achievements/${userData.email}`)}>
                   View Certificates
                 </ActionLink>
               </Field>
             )}
 
-            <BackButton onClick={() => navigate(-1)}>← Back</BackButton>
+            <BackButton onClick={() => navigate(-1)}>
+              ← Back to Participants
+            </BackButton>
           </InfoCard>
         )}
       </ContentWrapper>

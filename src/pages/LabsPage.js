@@ -443,18 +443,26 @@ const LabsPage = () => {
   const [participants, setParticipants] = useState([]);
   const [loading, setLoading] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
+  const [labsData, setLabsData] = useState([]);
 
   useEffect(() => {
-    const fetchAllUsers = async () => {
+    const fetchData = async () => {
       try {
-        const usersSnapshot = await getDocs(collection(db, "Users"));
+        const [usersSnapshot, labsSnapshot] = await Promise.all([
+          getDocs(collection(db, "Users")),
+          getDocs(collection(db, "Labs"))
+        ]);
+        
         const users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const labs = labsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
         setAllUsers(users);
+        setLabsData(labs);
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error("Error fetching data:", error);
       }
     };
-    fetchAllUsers();
+    fetchData();
   }, []);
 
   const labs = [
@@ -514,10 +522,16 @@ const LabsPage = () => {
       const usersSnapshot = await getDocs(collection(db, "Users"));
       const allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       
-      // Filter users who have this lab in their labName field
-      const labParticipants = allUsers.filter(user => 
-        user.labName && user.labName.toLowerCase().includes(labTitle.toLowerCase())
-      );
+      // Filter users who have this lab in their activeLabs or legacy labName field
+      const labParticipants = allUsers.filter(user => {
+        // Check new activeLabs structure (would need lab ID mapping)
+        if (user.activeLabs && user.activeLabs.length > 0) {
+          // For now, return false as we'd need to fetch lab details
+          return false;
+        }
+        // Check legacy labName structure
+        return user.labName && user.labName.toLowerCase().includes(labTitle.toLowerCase());
+      });
       
       setParticipants(labParticipants);
     } catch (error) {
@@ -598,9 +612,17 @@ const LabsPage = () => {
   };
 
   const getEnrolledCount = (labTitle) => {
-    return allUsers.filter(user => 
-      user.labName && user.labName.toLowerCase().includes(labTitle.toLowerCase())
-    ).length;
+    return allUsers.filter(user => {
+      // Check new activeLabs structure
+      if (user.activeLabs && user.activeLabs.length > 0) {
+        return user.activeLabs.some(labId => {
+          const lab = labsData.find(l => l.id === labId);
+          return lab && lab.labName && lab.labName.toLowerCase().includes(labTitle.toLowerCase());
+        });
+      }
+      // Check legacy labName structure
+      return user.labName && user.labName.toLowerCase().includes(labTitle.toLowerCase());
+    }).length;
   };
 
   return (
