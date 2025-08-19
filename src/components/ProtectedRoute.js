@@ -8,6 +8,15 @@ import UnauthorizedAccess from "./UnauthorizedAccess";
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, role, loading } = useAuth();
 
+  // Debug logging
+  console.log('ProtectedRoute Debug:', {
+    user: user?.email,
+    role,
+    loading,
+    allowedRoles,
+    hasAccess: role === "superadmin" || allowedRoles.includes(role)
+  });
+
   if (loading) {
     return <Loader />;
   }
@@ -18,6 +27,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
   // Super admin has access to all routes
   if (role !== "superadmin" && !allowedRoles.includes(role)) {
+    console.log('Access denied - Role check failed:', { role, allowedRoles });
     return <UnauthorizedAccess />;
   }
 

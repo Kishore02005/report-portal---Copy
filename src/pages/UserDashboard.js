@@ -22,19 +22,43 @@ const shimmer = keyframes`
 /* -------------------- STYLED COMPONENTS -------------------- */
 const PageContainer = styled.div`
   min-height: 100vh;
-  background-color: #f0f4f8;
+  width: 100%;
+  max-width: 100vw;
+  background: 
+    linear-gradient(135deg, rgba(30, 58, 138, 0.85) 0%, rgba(59, 130, 246, 0.85) 50%, rgba(30, 64, 175, 0.85) 100%),
+    url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  
+  @media (max-width: 768px) {
+    background-attachment: scroll;
+  }
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   overflow-x: hidden;
-
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  
+  * {
+    box-sizing: border-box;
+  }
+  
   &::before {
     content: '';
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    height: 400px;
-    background: linear-gradient(180deg, rgba(219, 234, 254, 0.6) 0%, rgba(240, 244, 248, 0) 100%);
+    bottom: 0;
+    background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
+    pointer-events: none;
     z-index: 0;
   }
 `;
@@ -45,38 +69,138 @@ const ContentWrapper = styled.div`
   max-width: 1400px;
   margin: 0 auto;
   padding: 1.5rem;
-  padding-top: 5.5rem; /* Space for Navbar */
+  padding-top: 5.5rem;
+  min-height: 100vh;
+  width: 100%;
+  
+  @media (max-width: 1024px) {
+    max-width: 100%;
+    padding: 1rem;
+    padding-top: 5rem;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 0.75rem;
+    padding-top: 4.5rem;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+    padding-top: 4rem;
+  }
+  
+  @media (max-width: 320px) {
+    padding: 0.25rem;
+    padding-top: 3.5rem;
+  }
 `;
 
 const WelcomeBanner = styled.div`
-  padding: 1.5rem 2rem;
-  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-  border-radius: 16px;
-  color: white;
+  padding: 2rem 2.5rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  color: #1e293b;
   margin-bottom: 2rem;
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6);
   animation: ${fadeIn} 0.5s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+  }
 
   svg {
     width: 48px;
     height: 48px;
     flex-shrink: 0;
+    color: #667eea;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 1rem 1.25rem;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    border-radius: 16px;
+    
+    svg {
+      width: 32px;
+      height: 32px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    padding: 0.75rem 1rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    border-radius: 12px;
   }
 `;
 
 const WelcomeText = styled.div`
+  flex: 1;
+  
   h1 {
     font-size: 1.75rem;
     font-weight: 700;
     margin: 0 0 4px 0;
+    line-height: 1.2;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    
+    @media (max-width: 1024px) {
+      font-size: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+      font-size: 1.25rem;
+      margin: 0 0 2px 0;
+    }
+    
+    @media (max-width: 480px) {
+      font-size: 1.1rem;
+    }
+    
+    @media (max-width: 320px) {
+      font-size: 1rem;
+    }
   }
   p {
     font-size: 1rem;
     margin: 0;
     opacity: 0.9;
+    line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    
+    @media (max-width: 1024px) {
+      font-size: 0.9rem;
+    }
+    
+    @media (max-width: 768px) {
+      font-size: 0.85rem;
+    }
+    
+    @media (max-width: 480px) {
+      font-size: 0.8rem;
+    }
+    
+    @media (max-width: 320px) {
+      font-size: 0.75rem;
+    }
   }
 `;
 
@@ -86,26 +210,71 @@ const DashboardGrid = styled.div`
   gap: 24px;
   align-items: start;
   
+  @media (max-width: 1200px) {
+    grid-template-columns: 280px 1fr;
+    gap: 20px;
+  }
+  
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  @media (max-width: 768px) {
+    gap: 12px;
+  }
+  
+  @media (max-width: 480px) {
+    gap: 10px;
   }
 `;
 
 const AnimatedCard = styled.div`
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
   padding: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(226, 232, 240, 0.7);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   animation: ${fadeIn} 0.6s ease forwards;
   animation-delay: ${({ delay }) => delay || '0s'};
   opacity: 0;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.6s ease;
+  }
 
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.1);
+    
+    &::before {
+      left: 100%;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    padding: 1rem;
+    border-radius: 16px;
+    
+    &:hover {
+      transform: translateY(-4px) scale(1.01);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    padding: 0.75rem;
+    border-radius: 12px;
   }
 `;
 
@@ -115,13 +284,17 @@ const ProfileCard = styled(AnimatedCard)`
   align-items: center;
   text-align: center;
   height: fit-content;
+  
+  @media (max-width: 1024px) {
+    margin-bottom: 0;
+  }
 `;
 
 const Avatar = styled.div`
   width: 90px;
   height: 90px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   display: flex;
   align-items: center;
@@ -129,7 +302,22 @@ const Avatar = styled.div`
   font-size: 2.5rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  
+  @media (max-width: 768px) {
+    width: 70px;
+    height: 70px;
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  @media (max-width: 480px) {
+    width: 60px;
+    height: 60px;
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+  }
 `;
 
 const UserName = styled.h2`
@@ -137,6 +325,16 @@ const UserName = styled.h2`
   font-size: 1.5rem;
   margin-bottom: 4px;
   font-weight: 600;
+  
+  @media (max-width: 768px) {
+    font-size: 1.25rem;
+    margin-bottom: 3px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1.1rem;
+    margin-bottom: 2px;
+  }
 `;
 
 const UserRole = styled.p`
@@ -146,6 +344,16 @@ const UserRole = styled.p`
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+    margin-bottom: 18px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.75rem;
+    margin-bottom: 12px;
+  }
 `;
 
 const StatsGrid = styled.div`
@@ -158,24 +366,70 @@ const StatsGrid = styled.div`
 
 const ExtendedStatsGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
   width: 100%;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  
+  @media (max-width: 768px) {
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
 `;
 
 const CompactStatItem = styled.div`
-  background: #f8fafc;
-  padding: 0.75rem;
-  border-radius: 12px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  padding: 1rem 0.75rem;
+  border-radius: 16px;
   text-align: center;
-  border: 1px solid #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  }
+  
+  @media (max-width: 768px) {
+    padding: 0.75rem 0.5rem;
+    min-height: 70px;
+    border-radius: 12px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+    min-height: 60px;
+    border-radius: 10px;
+  }
 `;
 
 const CompactStatIcon = styled.div`
   color: #3b82f6;
   font-size: 1.2rem;
   margin-bottom: 6px;
+  
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1rem;
+    margin-bottom: 3px;
+  }
 `;
 
 const CompactStatValue = styled.div`
@@ -183,12 +437,24 @@ const CompactStatValue = styled.div`
   font-weight: 700;
   color: #1e293b;
   line-height: 1;
+  
+  @media (max-width: 768px) {
+    font-size: 1.3rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1.2rem;
+  }
 `;
 
 const CompactStatLabel = styled.div`
   font-size: 0.7rem;
   color: #64748b;
   font-weight: 500;
+  
+  @media (max-width: 480px) {
+    font-size: 0.65rem;
+  }
 `;
 
 const StatItem = styled.div`
@@ -225,6 +491,16 @@ const InfoSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  
+  @media (max-width: 768px) {
+    padding-top: 12px;
+    gap: 6px;
+  }
+  
+  @media (max-width: 480px) {
+    padding-top: 10px;
+    gap: 5px;
+  }
 `;
 
 const InfoItem = styled.div`
@@ -233,15 +509,33 @@ const InfoItem = styled.div`
   align-items: center;
   padding: 4px 0;
   font-size: 0.9rem;
+  
+  @media (max-width: 768px) {
+    font-size: 0.85rem;
+    padding: 3px 0;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+    padding: 2px 0;
+  }
 `;
 
 const InfoLabel = styled.span`
   color: #64748b;
+  
+  @media (max-width: 480px) {
+    font-size: 0.75rem;
+  }
 `;
 
 const InfoValue = styled.span`
   color: #1e293b;
   font-weight: 500;
+  
+  @media (max-width: 480px) {
+    font-size: 0.75rem;
+  }
 `;
 
 const SectionHeader = styled.div`
@@ -249,6 +543,16 @@ const SectionHeader = styled.div`
   color: #1e293b;
   margin-bottom: 8px;
   font-size: 0.9rem;
+  
+  @media (max-width: 768px) {
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+  }
 `;
 
 const ActivityItem = styled.div`
@@ -265,6 +569,26 @@ const ActivityItem = styled.div`
     flex-shrink: 0;
     margin-top: 2px;
   }
+  
+  @media (max-width: 768px) {
+    gap: 8px;
+    padding: 5px 0;
+    font-size: 0.8rem;
+    
+    svg {
+      font-size: 0.85rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    gap: 6px;
+    padding: 4px 0;
+    font-size: 0.75rem;
+    
+    svg {
+      font-size: 0.8rem;
+    }
+  }
 `;
 
 const ActivityName = styled.span`
@@ -272,12 +596,24 @@ const ActivityName = styled.span`
   word-break: break-word;
   flex: 1;
   text-align: left;
+  
+  @media (max-width: 480px) {
+    line-height: 1.3;
+  }
 `;
 
 const MainContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: 24px;
+  
+  @media (max-width: 768px) {
+    gap: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    gap: 10px;
+  }
 `;
 
 const ProgressCard = styled(AnimatedCard)``;
@@ -295,6 +631,18 @@ const CardHeader = styled.div`
 
   svg {
     color: #3b82f6;
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.95rem;
+    gap: 8px;
+    margin-bottom: 10px;
   }
 `;
 
@@ -334,6 +682,16 @@ const IframeContainer = styled.div`
   overflow: hidden;
   border: 1px solid #e2e8f0;
   margin-bottom: 16px;
+  
+  @media (max-width: 768px) {
+    height: 300px;
+    margin-bottom: 12px;
+  }
+  
+  @media (max-width: 480px) {
+    height: 250px;
+    margin-bottom: 10px;
+  }
 `;
 
 const Iframe = styled.iframe`
@@ -346,6 +704,15 @@ const ActionButtons = styled.div`
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
+  
+  @media (max-width: 768px) {
+    gap: 10px;
+  }
+  
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 8px;
+  }
 `;
 
 const Button = styled.a`
@@ -361,6 +728,18 @@ const Button = styled.a`
   transition: all 0.3s ease;
   cursor: pointer;
   border: 1px solid transparent;
+  
+  @media (max-width: 768px) {
+    padding: 9px 16px;
+    font-size: 0.85rem;
+    gap: 6px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 10px 14px;
+    font-size: 0.8rem;
+    width: 100%;
+  }
 `;
 
 const PrimaryButton = styled(Button)`
@@ -394,24 +773,55 @@ const EmptyStateCard = styled(AnimatedCard)`
     align-items: center;
     justify-content: center;
     gap: 1rem;
+    background: rgba(248, 250, 252, 0.9);
+    backdrop-filter: blur(20px);
     
     svg {
         font-size: 3rem;
-        color: #94a3b8;
+        color: #667eea;
     }
     
     p {
-        color: #64748b;
+        color: #475569;
         font-size: 1rem;
         max-width: 350px;
         line-height: 1.5;
         margin: 0;
     }
+    
+    @media (max-width: 768px) {
+        padding: 2rem 1.5rem;
+        gap: 0.75rem;
+        
+        svg {
+            font-size: 2.5rem;
+        }
+        
+        p {
+            font-size: 0.9rem;
+            max-width: 300px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        padding: 1.5rem 1rem;
+        gap: 0.5rem;
+        
+        svg {
+            font-size: 2rem;
+        }
+        
+        p {
+            font-size: 0.85rem;
+            max-width: 250px;
+        }
+    }
 `;
 
 const ErrorText = styled(EmptyStateCard)`
-  border-color: #fecaca;
-  background: #fef2f2;
+  border: 2px solid rgba(254, 202, 202, 0.8);
+  background: rgba(254, 242, 242, 0.9);
+  backdrop-filter: blur(20px);
   
   svg {
     color: #ef4444;
@@ -426,21 +836,62 @@ const CoursesList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
+  
+  @media (max-width: 768px) {
+    gap: 10px;
+  }
+  
+  @media (max-width: 480px) {
+    gap: 8px;
+  }
 `;
 
 const CourseItem = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  transition: all 0.2s ease;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(248, 250, 252, 0.8) 100%);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+  }
   
   &:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
+    transform: translateY(-4px);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    
+    &::before {
+      left: 100%;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 16px;
+    border-radius: 12px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 10px 12px;
+    gap: 6px;
+    border-radius: 10px;
   }
 `;
 
@@ -448,24 +899,63 @@ const CourseInfo = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
+  
+  @media (max-width: 768px) {
+    gap: 10px;
+  }
+  
+  @media (max-width: 480px) {
+    gap: 8px;
+  }
 `;
 
 const CourseIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 12px 25px rgba(102, 126, 234, 0.4);
+  }
+  
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+    border-radius: 12px;
+  }
+  
+  @media (max-width: 480px) {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+    border-radius: 10px;
+  }
 `;
 
 const CourseName = styled.div`
   font-weight: 600;
   color: #1e293b;
   font-size: 0.95rem;
+  
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.85rem;
+  }
 `;
 
 const CourseStatus = styled.div`
@@ -475,6 +965,20 @@ const CourseStatus = styled.div`
   font-weight: 600;
   background: #dbeafe;
   color: #1e40af;
+  white-space: nowrap;
+  
+  @media (max-width: 768px) {
+    align-self: flex-end;
+    margin-top: 4px;
+    padding: 3px 10px;
+    font-size: 0.7rem;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 2px 8px;
+    font-size: 0.65rem;
+    border-radius: 12px;
+  }
 `;
 
 /* -------------------- SKELETON LOADER -------------------- */
@@ -567,38 +1071,61 @@ const UserDashboard = () => {
           const data = userDocSnap.data();
           setUserData(data);
           
-          // Fetch active labs details
-          if (data.activeLabs && data.activeLabs.length > 0) {
-            const labsRef = collection(db, "Labs");
-            const allLabsSnap = await getDocs(labsRef);
-            const allLabsMap = new Map();
-            allLabsSnap.docs.forEach(d => allLabsMap.set(d.id, d.data()));
-            
-            const activeLabsDetails = data.activeLabs
-              .map(labId => {
-                const labDetails = allLabsMap.get(labId);
-                return labDetails ? { id: labId, name: labDetails.labName } : null;
-              })
-              .filter(lab => lab !== null);
-            
-            setActiveLabs(activeLabsDetails);
-          }
+
           
-          // Fetch active courses details
-          if (data.activeCourses && data.activeCourses.length > 0) {
-            const coursesRef = collection(db, "Courses");
-            const allCoursesSnap = await getDocs(coursesRef);
-            const allCoursesMap = new Map();
-            allCoursesSnap.docs.forEach(d => allCoursesMap.set(d.id, d.data()));
-            
-            const activeCoursesDetails = data.activeCourses
+          // Fetch Labs and Courses data first
+          const [labsSnap, coursesSnap] = await Promise.all([
+            getDocs(collection(db, "Labs")),
+            getDocs(collection(db, "Courses"))
+          ]);
+          
+          const allLabsMap = new Map();
+          const allCoursesMap = new Map();
+          
+          labsSnap.docs.forEach(d => allLabsMap.set(d.id, d.data()));
+          coursesSnap.docs.forEach(d => allCoursesMap.set(d.id, d.data()));
+          
+          console.log('All labs from DB:', Array.from(allLabsMap.entries()));
+          console.log('All courses from DB:', Array.from(allCoursesMap.entries()));
+          
+          // Fetch active courses details from activeCoursesProgress
+          if (data.activeCoursesProgress && Object.keys(data.activeCoursesProgress).length > 0) {
+            const activeCoursesDetails = Object.keys(data.activeCoursesProgress)
               .map(courseId => {
                 const courseDetails = allCoursesMap.get(courseId);
-                return courseDetails ? { id: courseId, name: courseDetails.name } : null;
+                const progressValue = data.activeCoursesProgress[courseId];
+                console.log(`Looking for course ${courseId}:`, courseDetails);
+                return courseDetails ? { 
+                  id: courseId, 
+                  name: courseDetails.name,
+                  progress: typeof progressValue === 'number' ? progressValue : 0,
+                  status: 'In Progress'
+                } : null;
               })
               .filter(course => course !== null);
             
+            console.log('Final active courses to set:', activeCoursesDetails);
             setActiveCourses(activeCoursesDetails);
+          }
+          
+          // Fetch active labs details from activeLabsProgress  
+          if (data.activeLabsProgress && Object.keys(data.activeLabsProgress).length > 0) {
+            const activeLabsDetails = Object.keys(data.activeLabsProgress)
+              .map(labId => {
+                const labDetails = allLabsMap.get(labId);
+                const progressValue = data.activeLabsProgress[labId];
+                console.log(`Looking for lab ${labId}:`, labDetails);
+                return labDetails ? { 
+                  id: labId, 
+                  name: labDetails.labName,
+                  progress: typeof progressValue === 'number' ? progressValue : 0,
+                  status: 'In Progress'
+                } : null;
+              })
+              .filter(lab => lab !== null);
+            
+            console.log('Final active labs to set:', activeLabsDetails);
+            setActiveLabs(activeLabsDetails);
           }
         } else {
           setError("User data not found. If this is an error, please contact support.");
@@ -616,15 +1143,54 @@ const UserDashboard = () => {
     fetchDashboardData();
   }, [user, authLoading]);
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
+  const calculateOverallProgress = (userData) => {
+    if (!userData) return 0;
+    
+    let totalProgress = 0;
+    let itemCount = 0;
+    
+    // Calculate progress from courses
+    if (userData.activeCoursesProgress) {
+      Object.values(userData.activeCoursesProgress).forEach(courseProgress => {
+        if (courseProgress.progress !== undefined) {
+          totalProgress += courseProgress.progress;
+          itemCount++;
+        }
+      });
+    }
+    
+    // Calculate progress from labs
+    if (userData.activeLabsProgress) {
+      Object.values(userData.activeLabsProgress).forEach(labProgress => {
+        if (labProgress.progress !== undefined) {
+          totalProgress += labProgress.progress;
+          itemCount++;
+        }
+      });
+    }
+    
+    return itemCount > 0 ? Math.round(totalProgress / itemCount) : 0;
+  };
+
+  const formatDate = (dateValue) => {
+    if (!dateValue) return "N/A";
     try {
-      const [year, month, day] = dateString.split('-');
-      const date = new Date(year, month - 1, day);
+      let date;
+      if (dateValue.seconds && dateValue.nanoseconds) {
+        // Firestore timestamp object
+        date = new Date(dateValue.seconds * 1000);
+      } else if (typeof dateValue === 'string') {
+        // String date format
+        const [year, month, day] = dateValue.split('-');
+        date = new Date(year, month - 1, day);
+      } else {
+        // Assume it's already a Date object or timestamp
+        date = new Date(dateValue);
+      }
       return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     } catch (e) {
       console.error("Error formatting date:", e);
-      return dateString;
+      return "N/A";
     }
   };
 
@@ -659,29 +1225,22 @@ const UserDashboard = () => {
         <ProfileCard delay="0.1s">
           <Avatar>{userInitial}</Avatar>
           <UserName>{userData.username || "User"}</UserName>
-          <UserRole>Student</UserRole>
+          <UserRole>{userData.role || "Student"}</UserRole>
           
           <ExtendedStatsGrid>
-            <CompactStatItem>
-              <CompactStatIcon><FiAward /></CompactStatIcon>
-              <CompactStatValue>
-                <CountUp end={userData.completion || 0} duration={1.5} suffix="%" />
-              </CompactStatValue>
-              <CompactStatLabel>Progress</CompactStatLabel>
-            </CompactStatItem>
             <CompactStatItem>
               <CompactStatIcon><FiBookOpen /></CompactStatIcon>
               <CompactStatValue>
                 <CountUp end={activeCourses.length} duration={1.5} />
               </CompactStatValue>
-              <CompactStatLabel>Courses</CompactStatLabel>
+              <CompactStatLabel>Active Courses</CompactStatLabel>
             </CompactStatItem>
             <CompactStatItem>
               <CompactStatIcon><FiActivity /></CompactStatIcon>
               <CompactStatValue>
                 <CountUp end={activeLabs.length} duration={1.5} />
               </CompactStatValue>
-              <CompactStatLabel>Labs</CompactStatLabel>
+              <CompactStatLabel>Active Labs</CompactStatLabel>
             </CompactStatItem>
           </ExtendedStatsGrid>
           
@@ -710,10 +1269,14 @@ const UserDashboard = () => {
           )}
           
           <InfoSection>
-            {userData.enrolment && (
+            {userData.enrollmentDates && Object.keys(userData.enrollmentDates).length > 0 && (
               <InfoItem>
-                <InfoLabel>Enrolled On</InfoLabel>
-                <InfoValue>{formatDate(userData.enrolment)}</InfoValue>
+                <InfoLabel>First Enrolled</InfoLabel>
+                <InfoValue>{formatDate(
+                  Object.values(userData.enrollmentDates)
+                    .map(date => date.seconds ? new Date(date.seconds * 1000) : new Date(date))
+                    .sort((a, b) => a - b)[0]
+                )}</InfoValue>
               </InfoItem>
             )}
           </InfoSection>
@@ -730,9 +1293,19 @@ const UserDashboard = () => {
                       <CourseIcon>
                         <FiBookOpen />
                       </CourseIcon>
-                      <CourseName>{course.name}</CourseName>
+                      <div style={{flex: 1}}>
+                        <CourseName>{course.name}</CourseName>
+                        <div style={{fontSize: '0.8rem', color: '#64748b', marginTop: '4px', marginBottom: '8px'}}>
+                          Progress: {course.progress}%
+                        </div>
+                        <div style={{width: '100%', height: '8px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden'}}>
+                          <div style={{width: `${course.progress}%`, height: '100%', background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)', borderRadius: '4px', transition: 'width 0.3s ease'}}></div>
+                        </div>
+                      </div>
                     </CourseInfo>
-                    <CourseStatus>In Progress</CourseStatus>
+                    <CourseStatus>
+                      {course.status}
+                    </CourseStatus>
                   </CourseItem>
                 ))}
               </CoursesList>
@@ -744,21 +1317,37 @@ const UserDashboard = () => {
             </EmptyStateCard>
           )}
 
-          <ProgressCard delay="0.3s">
-            <CardHeader><FiActivity /> Course Progress</CardHeader>
-            <ProgressHeader>
-                <div style={{fontWeight: 500}}>Overall Completion</div>
-                <ProgressPercentage>
-                    <CountUp end={userData.completion || 0} duration={1.5} suffix="%" />
-                </ProgressPercentage>
-            </ProgressHeader>
-            <ProgressBarContainer>
-              <Progress $percent={userData.completion || 0} />
-            </ProgressBarContainer>
-          </ProgressCard>
+          {activeLabs.length > 0 && (
+            <ActiveCoursesCard delay="0.3s">
+              <CardHeader><FiActivity /> Active Labs</CardHeader>
+              <CoursesList>
+                {activeLabs.map((lab) => (
+                  <CourseItem key={lab.id}>
+                    <CourseInfo>
+                      <CourseIcon>
+                        <FiActivity />
+                      </CourseIcon>
+                      <div style={{flex: 1}}>
+                        <CourseName>{lab.name}</CourseName>
+                        <div style={{fontSize: '0.8rem', color: '#64748b', marginTop: '4px', marginBottom: '8px'}}>
+                          Progress: {lab.progress}%
+                        </div>
+                        <div style={{width: '100%', height: '8px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden'}}>
+                          <div style={{width: `${lab.progress}%`, height: '100%', background: 'linear-gradient(90deg, #f093fb 0%, #764ba2 100%)', borderRadius: '4px', transition: 'width 0.3s ease'}}></div>
+                        </div>
+                      </div>
+                    </CourseInfo>
+                    <CourseStatus>
+                      {lab.status}
+                    </CourseStatus>
+                  </CourseItem>
+                ))}
+              </CoursesList>
+            </ActiveCoursesCard>
+          )}
 
           {userData.reportUrl ? (
-            <ReportCard delay="0.4s">
+            <ReportCard delay="0.5s">
               <CardHeader><FiFileText /> Learning Report</CardHeader>
               <IframeContainer>
                 <Iframe 
@@ -786,7 +1375,7 @@ const UserDashboard = () => {
               </ActionButtons>
             </ReportCard>
           ) : (
-            <EmptyStateCard delay="0.4s">
+            <EmptyStateCard delay="0.5s">
                 <FiFileText />
                 <p>Your personalized report will be available here once you've made more progress in the course.</p>
             </EmptyStateCard>

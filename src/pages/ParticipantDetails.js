@@ -157,15 +157,17 @@ const BackButton = styled.button`
   color: white;
   border: none;
   border-radius: 8px;
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 1.2rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   align-self: flex-start;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
+  min-width: 140px;
 
   &:hover {
     background: #4b5563;
@@ -174,12 +176,15 @@ const BackButton = styled.button`
   
   @media (max-width: 768px) {
     margin-top: 1.5rem;
-    align-self: stretch;
+    align-self: center;
+    width: 100%;
+    max-width: 200px;
   }
   
   @media (max-width: 480px) {
-    padding: 0.6rem 1rem;
-    font-size: 0.85rem;
+    padding: 0.7rem 1rem;
+    font-size: 0.8rem;
+    min-width: 120px;
   }
 `;
 
@@ -224,34 +229,46 @@ const ParticipantDetails = () => {
           const data = { id: userDocSnap.id, ...userDocSnap.data() };
           setUserData(data);
           
-          // Fetch active labs details
-          if (data.activeLabs && data.activeLabs.length > 0) {
-            const labsRef = collection(db, "Labs");
-            const allLabsSnap = await getDocs(labsRef);
-            const allLabsMap = new Map();
-            allLabsSnap.docs.forEach(d => allLabsMap.set(d.id, d.data()));
-            
-            const activeLabsDetails = data.activeLabs
+          // Fetch Labs and Courses data
+          const [labsSnap, coursesSnap] = await Promise.all([
+            getDocs(collection(db, "Labs")),
+            getDocs(collection(db, "Courses"))
+          ]);
+          
+          const allLabsMap = new Map();
+          const allCoursesMap = new Map();
+          
+          labsSnap.docs.forEach(d => allLabsMap.set(d.id, d.data()));
+          coursesSnap.docs.forEach(d => allCoursesMap.set(d.id, d.data()));
+          
+          // Fetch active labs details from activeLabsProgress
+          if (data.activeLabsProgress && Object.keys(data.activeLabsProgress).length > 0) {
+            const activeLabsDetails = Object.keys(data.activeLabsProgress)
               .map(labId => {
                 const labDetails = allLabsMap.get(labId);
-                return labDetails ? { id: labId, name: labDetails.labName } : null;
+                const enrollmentDate = data.enrollmentDates?.[labId];
+                return labDetails ? { 
+                  id: labId, 
+                  name: labDetails.labName,
+                  enrollmentDate: enrollmentDate
+                } : null;
               })
               .filter(lab => lab !== null);
             
             setActiveLabs(activeLabsDetails);
           }
           
-          // Fetch active courses details
-          if (data.activeCourses && data.activeCourses.length > 0) {
-            const coursesRef = collection(db, "Courses");
-            const allCoursesSnap = await getDocs(coursesRef);
-            const allCoursesMap = new Map();
-            allCoursesSnap.docs.forEach(d => allCoursesMap.set(d.id, d.data()));
-            
-            const activeCoursesDetails = data.activeCourses
+          // Fetch active courses details from activeCoursesProgress
+          if (data.activeCoursesProgress && Object.keys(data.activeCoursesProgress).length > 0) {
+            const activeCoursesDetails = Object.keys(data.activeCoursesProgress)
               .map(courseId => {
                 const courseDetails = allCoursesMap.get(courseId);
-                return courseDetails ? { id: courseId, name: courseDetails.name } : null;
+                const enrollmentDate = data.enrollmentDates?.[courseId];
+                return courseDetails ? { 
+                  id: courseId, 
+                  name: courseDetails.name,
+                  enrollmentDate: enrollmentDate
+                } : null;
               })
               .filter(course => course !== null);
             
@@ -313,38 +330,52 @@ const ParticipantDetails = () => {
               <FieldLabel>Organization:</FieldLabel>
               <FieldValue>{organizationName || "Independent"}</FieldValue>
             </Field>
-            {activeCourses.length > 0 && (
-              <Field>
-                <FieldLabel>Active Courses:</FieldLabel>
-                <FieldValue>{activeCourses.map(course => course.name).join(', ')}</FieldValue>
+            {activeCourses.length > 0 && activeCourses.map(course => (
+              <Field key={course.id}>
+                <FieldLabel>Course:</FieldLabel>
+                <FieldValue>
+                  {course.name}
+                  {course.enrollmentDate && (
+                    <span style={{fontSize: '0.75rem', color: '#64748b', display: 'block', marginTop: '2px'}}>
+                      Enrolled: {course.enrollmentDate.seconds 
+                        ? new Date(course.enrollmentDate.seconds * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                        : new Date(course.enrollmentDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                      }
+                    </span>
+                  )}
+                </FieldValue>
               </Field>
-            )}
-            {activeLabs.length > 0 && (
-              <Field>
-                <FieldLabel>Active Labs:</FieldLabel>
-                <FieldValue>{activeLabs.map(lab => lab.name).join(', ')}</FieldValue>
+            ))}
+            {activeLabs.length > 0 && activeLabs.map(lab => (
+              <Field key={lab.id}>
+                <FieldLabel>Lab:</FieldLabel>
+                <FieldValue>
+                  {lab.name}
+                  {lab.enrollmentDate && (
+                    <span style={{fontSize: '0.75rem', color: '#64748b', display: 'block', marginTop: '2px'}}>
+                      Enrolled: {lab.enrollmentDate.seconds 
+                        ? new Date(lab.enrollmentDate.seconds * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                        : new Date(lab.enrollmentDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                      }
+                    </span>
+                  )}
+                </FieldValue>
               </Field>
-            )}
+            ))}
             {userData.labName && (
               <Field>
                 <FieldLabel>Legacy Lab:</FieldLabel>
                 <FieldValue>{userData.labName}</FieldValue>
               </Field>
             )}
-            <Field>
-              <FieldLabel>Enrollment Date:</FieldLabel>
-              <FieldValue>{userData.enrolment ? new Date(userData.enrolment).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : "N/A"}</FieldValue>
-            </Field>
-            <Field>
-              <FieldLabel>Progress:</FieldLabel>
-              <FieldValue>{userData.completion || 0}%</FieldValue>
-            </Field>
-            {userData.courses && userData.courses.length > 0 && (
+            {userData.enrolment && (
               <Field>
-                <FieldLabel>Legacy Courses:</FieldLabel>
-                <FieldValue>{userData.courses.length} enrolled</FieldValue>
+                <FieldLabel>Enrollment Date:</FieldLabel>
+                <FieldValue>{new Date(userData.enrolment).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</FieldValue>
               </Field>
             )}
+
+
             {userData.reportUrl && (
               <Field>
                 <FieldLabel>Report:</FieldLabel>

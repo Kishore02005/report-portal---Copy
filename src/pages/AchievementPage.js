@@ -22,9 +22,28 @@ const shimmer = keyframes`
 /* -------------------- STYLED COMPONENTS -------------------- */
 const PageContainer = styled.div`
   min-height: 100vh;
-  background-color: #f8fafc;
+  width: 100%;
+  max-width: 100vw;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
   display: flex;
   margin-left: ${props => props.isAdminView ? '250px' : '0'};
+  position: relative;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
 
   @media (max-width: 768px) {
     margin-left: 0;
@@ -32,6 +51,8 @@ const PageContainer = styled.div`
 `;
 
 const ContentWrapper = styled.div`
+  position: relative;
+  z-index: 1;
   flex: 1;
   width: 100%;
   padding: 0 2rem 3rem 2rem;
@@ -39,6 +60,14 @@ const ContentWrapper = styled.div`
   animation: ${fadeIn} 0.5s ease-out;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  
+  @media (max-width: 1024px) {
+    padding: 0 1.5rem 2.5rem 1.5rem;
+    padding-top: ${props => props.isAdminView ? '1.5rem' : 'calc(70px + 1.5rem)'};
+  }
   
   @media (max-width: 768px) {
     padding: 0 1rem 2rem 1rem;
@@ -48,6 +77,11 @@ const ContentWrapper = styled.div`
   @media (max-width: 480px) {
     padding: 0 0.75rem 1.5rem 0.75rem;
     padding-top: calc(70px + 0.75rem);
+  }
+  
+  @media (max-width: 320px) {
+    padding: 0 0.5rem 1rem 0.5rem;
+    padding-top: calc(70px + 0.5rem);
   }
 `;
 
@@ -100,16 +134,17 @@ const BackButton = styled.button`
 const PageTitle = styled.h1`
   font-size: 2.5rem;
   font-weight: 800;
-  color: #1e293b;
+  color: #ffffff;
   margin: 0 0 0.5rem 0;
   letter-spacing: -0.04em;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 1rem;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 
   svg {
-    color: #3b82f6;
+    color: #ffffff;
   }
   
   @media (max-width: 768px) {
@@ -125,11 +160,12 @@ const PageTitle = styled.h1`
 `;
 
 const PageSubtitle = styled.p`
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 1.1rem;
   max-width: 600px;
   margin: 0 auto;
   line-height: 1.6;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   
   @media (max-width: 768px) {
     font-size: 1rem;
@@ -167,22 +203,37 @@ const CertificateGrid = styled.div`
 
 
 const CertificateCard = styled.div`
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
   width: 100%;
   max-width: 300px;
   
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.6s ease;
+  }
+  
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    
+    &::before {
+      left: 100%;
+    }
   }
   
   @media (max-width: 480px) {
@@ -221,15 +272,15 @@ const DownloadButtonOverlay = styled.a`
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   border-radius: 50%;
-  color: #3b82f6;
+  color: #f093fb;
   text-decoration: none;
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   
   &:hover {
-    background: rgba(59, 130, 246, 0.1);
+    background: rgba(240, 147, 251, 0.1);
     transform: scale(1.1);
-    color: #1d4ed8;
+    color: #f5576c;
   }
   
   svg {
@@ -276,11 +327,23 @@ const CertificateTitle = styled.h3`
   color: #1e293b;
   font-weight: 600;
   margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   line-height: 1.3;
   flex: 1;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.75rem;
+  }
+  
+  @media (max-width: 320px) {
+    font-size: 0.7rem;
+  }
 `;
 
 
@@ -297,14 +360,14 @@ const DownloadButton = styled.a`
   font-size: 0.75rem;
   transition: all 0.2s ease;
   cursor: pointer;
-  color: #3b82f6;
+  color: #f093fb;
   background: #f1f5f9;
   border: 1px solid #e2e8f0;
   flex-shrink: 0;
 
   &:hover {
     background: #e2e8f0;
-    color: #1e40af;
+    color: #f5576c;
     transform: translateY(-1px);
   }
 `;
@@ -312,18 +375,31 @@ const DownloadButton = styled.a`
 const EmptyState = styled.div`
   margin-top: 2rem;
   padding: 3rem 2rem;
-  background: white;
-  border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #f093fb, #f5576c, #4facfe);
+  }
 
   svg {
     font-size: 3rem;
-    color: #cbd5e1;
+    color: #f093fb;
   }
   h3 {
     font-size: 1.25rem;
@@ -331,7 +407,7 @@ const EmptyState = styled.div`
     margin: 0;
   }
   p {
-    color: #64748b;
+    color: #475569;
     max-width: 400px;
     margin: 0;
   }

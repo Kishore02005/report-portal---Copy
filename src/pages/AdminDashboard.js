@@ -518,10 +518,10 @@ const AdminDashboard = () => {
     let coursesCount = 0;
 
     participants.forEach(p => {
-      if ((p.activeLabs && p.activeLabs.length > 0) || p.labName) {
+      if (p.activeLabsProgress && Object.keys(p.activeLabsProgress).length > 0) {
         hiLabsCount++;
       }
-      if ((p.activeCourses && p.activeCourses.length > 0) || (p.courses && p.courses.length > 0)) {
+      if (p.activeCoursesProgress && Object.keys(p.activeCoursesProgress).length > 0) {
         coursesCount++;
       }
     });
@@ -533,19 +533,7 @@ const AdminDashboard = () => {
     };
   };
 
-  const getCourseNameFromId = (courseId) => {
-    const courseMap = {
-      'course_01': 'Empowering Human Intelligence–7-Day Online Course',
-      'course_02': 'The 7-Day Reset: Clarity, Confidence, and Communication',
-      'course_03': 'The 30-Day Foundation: Purpose-Driven Professionalism',
-      'course_04': 'The 45-Day Career Rewire: Aligning Work with Self',
-      'course_05': 'Leadership from Within: 21-Day Intensive for Founders & Changemakers',
-      'course_06': 'The Aaruchudar Educator Program (30 Days or Custom)',
-      'course_07': 'Institutional Innovation Catalyst (45 Days)',
-      'course_08': 'Custom Sprint Labs / Retreats (2–5 Days)'
-    };
-    return courseMap[courseId] || courseId;
-  };
+
 
   const getUniqueLabsAndCourses = () => {
     const labNamesMap = new Map();
@@ -554,79 +542,47 @@ const AdminDashboard = () => {
     const normalize = (str) => str.trim().toLowerCase().replace(/\s+/g, ' ');
 
     participants.forEach(p => {
-      // Labs - normalize and deduplicate
-      if (p.activeLabs?.length > 0) {
-        p.activeLabs.forEach(labId => {
+      // Labs from activeLabsProgress
+      if (p.activeLabsProgress) {
+        Object.keys(p.activeLabsProgress).forEach(labId => {
           const labData = labsMap.get(labId);
           if (labData?.labName) {
             const normalized = normalize(labData.labName);
-            console.log('Lab from activeLabs:', labData.labName, '-> normalized:', normalized);
             labNamesMap.set(normalized, labData.labName.trim());
           }
         });
       }
-      if (p.labName) {
-        const normalized = normalize(p.labName);
-        console.log('Lab from labName:', p.labName, '-> normalized:', normalized);
-        labNamesMap.set(normalized, p.labName.trim());
-      }
       
-      // Courses - normalize and deduplicate
-      if (p.activeCourses?.length > 0) {
-        p.activeCourses.forEach(courseId => {
+      // Courses from activeCoursesProgress
+      if (p.activeCoursesProgress) {
+        Object.keys(p.activeCoursesProgress).forEach(courseId => {
           const courseData = coursesMap.get(courseId);
           if (courseData?.name) {
             const normalized = normalize(courseData.name);
-            console.log('Course from activeCourses:', courseData.name, '-> normalized:', normalized);
             courseNamesMap.set(normalized, courseData.name.trim());
-          }
-        });
-      }
-      if (p.courses?.length > 0) {
-        p.courses.forEach(course => {
-          const courseName = getCourseNameFromId(course);
-          if (courseName) {
-            const normalized = normalize(courseName);
-            console.log('Course from courses array:', courseName, '-> normalized:', normalized);
-            courseNamesMap.set(normalized, courseName.trim());
           }
         });
       }
     });
 
-    const finalLabs = [...labNamesMap.values()].filter(Boolean).sort();
-    const finalCourses = [...courseNamesMap.values()].filter(Boolean).sort();
-    
-    console.log('Final unique labs:', finalLabs);
-    console.log('Final unique courses:', finalCourses);
-
     return {
-      labs: finalLabs,
-      courses: finalCourses
+      labs: [...labNamesMap.values()].filter(Boolean).sort(),
+      courses: [...courseNamesMap.values()].filter(Boolean).sort()
     };
   };
 
   const { labs, courses } = getUniqueLabsAndCourses();
   
-  // Additional debug logging
-  console.log('Participants data:', participants.map(p => ({
-    id: p.id,
-    activeLabs: p.activeLabs,
-    labName: p.labName,
-    activeCourses: p.activeCourses,
-    courses: p.courses
-  })));
-  console.log('Labs map:', Array.from(labsMap.entries()));
-  console.log('Courses map:', Array.from(coursesMap.entries()));
+
 
   const { total, hiLabs, courses: coursesCount } = getStats();
 
   const filteredParticipants = participants.filter(p => {
     if (filter === 'hilabs') {
-      return (p.activeLabs && p.activeLabs.length > 0) || p.labName;
+      return p.activeLabsProgress && Object.keys(p.activeLabsProgress).length > 0;
     }
     if (filter === 'courses') {
-      return (p.activeCourses && p.activeCourses.length > 0) || (p.courses && p.courses.length > 0);
+      return p.activeCoursesProgress && Object.keys(p.activeCoursesProgress).length > 0;
     }
     return true;
   });

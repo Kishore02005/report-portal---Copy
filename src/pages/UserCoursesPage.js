@@ -20,39 +20,67 @@ const slideIn = keyframes`
 
 const PageContainer = styled.div`
   min-height: 100vh;
-  background: #ffffff;
+  width: 100%;
+  max-width: 100vw;
+  background: 
+    linear-gradient(135deg, rgba(79, 172, 254, 0.85) 0%, rgba(0, 242, 254, 0.85) 50%, rgba(67, 233, 123, 0.85) 100%),
+    url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  padding: 70px 0 0 0;
-  margin: 0;
   position: relative;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
   color: #1e293b;
   
-  @media (max-width: 768px) {
-    padding-top: 60px;
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
   }
 `;
 
 const ContentWrapper = styled.div`
+  position: relative;
+  z-index: 1;
   max-width: 1200px;
   margin: 0 auto;
   padding: 2.5rem 1.875rem 3rem 1.875rem;
+  padding-top: 6rem;
   text-align: center;
-  position: relative;
-  z-index: 1;
+  min-height: 100vh;
   animation: ${fadeIn} 0.8s ease-out;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
   
   @media (max-width: 1024px) {
-    max-width: 1000px;
+    max-width: 100%;
     padding: 2rem 1.5rem 2.5rem 1.5rem;
+    padding-top: 5.5rem;
   }
   
   @media (max-width: 768px) {
     padding: 1.5rem 1rem 2rem 1rem;
-    max-width: 100%;
+    padding-top: 5rem;
   }
   
   @media (max-width: 480px) {
     padding: 1rem 0.75rem 1.5rem 0.75rem;
+    padding-top: 4.5rem;
+  }
+  
+  @media (max-width: 320px) {
+    padding: 0.75rem 0.5rem 1rem 0.5rem;
+    padding-top: 4rem;
   }
 `;
 
@@ -64,7 +92,7 @@ const HeaderSection = styled.div`
 
 const Title = styled.h2`
   font-size: 2.75rem;
-  color: #0f172a;
+  color: #ffffff;
   margin-bottom: 1rem;
   text-align: center;
   font-weight: 700;
@@ -74,9 +102,10 @@ const Title = styled.h2`
   align-items: center;
   justify-content: center;
   gap: 1rem;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   
   svg {
-    color: #3b82f6;
+    color: #ffffff;
   }
   
   @media (max-width: 768px) {
@@ -94,11 +123,12 @@ const Title = styled.h2`
 
 const Subtitle = styled.p`
   font-size: 1.125rem;
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.9);
   margin: 0 auto;
   max-width: 600px;
   line-height: 1.6;
   font-weight: 400;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   
   @media (max-width: 768px) {
     font-size: 1rem;
@@ -122,24 +152,31 @@ const StatsBar = styled.div`
 `;
 
 const StatItem = styled.div`
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
   padding: 1rem 1.5rem;
   text-align: center;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
   
   h3 {
     font-size: 1.75rem;
     font-weight: 700;
     margin: 0;
-    color: #3b82f6;
+    color: #4facfe;
     font-family: 'Inter', sans-serif;
   }
   
   p {
     font-size: 0.875rem;
     margin: 0.25rem 0 0 0;
-    color: #64748b;
+    color: #475569;
     font-weight: 500;
   }
   
@@ -174,17 +211,18 @@ const CourseGrid = styled.div`
 `;
 
 const CourseCard = styled.div`
-  background: white;
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
   padding: 1.75rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   position: relative;
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   animation: ${fadeIn} 0.6s ease-out;
   animation-delay: ${props => props.index * 0.1}s;
   animation-fill-mode: both;
@@ -195,19 +233,33 @@ const CourseCard = styled.div`
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+    height: 3px;
+    background: linear-gradient(90deg, #4facfe, #00f2fe, #43e97b);
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.6s ease;
   }
   
   &:hover {
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    
+    &::after {
+      left: 100%;
+    }
   }
   
   @media (max-width: 768px) {
     padding: 1.5rem;
-    border-radius: 12px;
+    border-radius: 16px;
     
     &:hover {
       transform: translateY(-4px) scale(1.01);
@@ -216,7 +268,7 @@ const CourseCard = styled.div`
   
   @media (max-width: 480px) {
     padding: 1.25rem;
-    border-radius: 10px;
+    border-radius: 12px;
   }
 `;
 
@@ -232,7 +284,7 @@ const CourseIcon = styled.div`
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -250,13 +302,24 @@ const CourseName = styled.h3`
   flex: 1;
   font-family: 'Inter', sans-serif;
   letter-spacing: -0.01em;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
   
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     font-size: 1.125rem;
   }
   
-  @media (max-width: 480px) {
+  @media (max-width: 768px) {
     font-size: 1rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+  }
+  
+  @media (max-width: 320px) {
+    font-size: 0.85rem;
   }
 `;
 
@@ -281,7 +344,7 @@ const CourseDetail = styled.div`
   }
   
   svg {
-    color: #3b82f6;
+    color: #4facfe;
     flex-shrink: 0;
   }
   
