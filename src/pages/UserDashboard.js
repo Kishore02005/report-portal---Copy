@@ -4,6 +4,7 @@ import { db } from "../firebaseConfig";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 import UserNavbar from "../components/UserNavbar";
+import Chatbot from "../components/Chatbot";
 import CountUp from 'react-countup';
 import { FiUser, FiActivity, FiFileText, FiDownload, FiExternalLink, FiAward, FiBookOpen, FiAlertCircle } from 'react-icons/fi';
 
@@ -22,18 +23,8 @@ const shimmer = keyframes`
 /* -------------------- STYLED COMPONENTS -------------------- */
 const PageContainer = styled.div`
   min-height: 100vh;
-  width: 100%;
-  max-width: 100vw;
-  background: 
-    linear-gradient(135deg, rgba(30, 58, 138, 0.85) 0%, rgba(59, 130, 246, 0.85) 50%, rgba(30, 64, 175, 0.85) 100%),
-    url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  
-  @media (max-width: 768px) {
-    background-attachment: scroll;
-  }
+  width: 100vw;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   position: fixed;
   top: 0;
@@ -72,6 +63,7 @@ const ContentWrapper = styled.div`
   padding-top: 5.5rem;
   min-height: 100vh;
   width: 100%;
+  box-sizing: border-box;
   
   @media (max-width: 1024px) {
     max-width: 100%;
@@ -294,7 +286,7 @@ const Avatar = styled.div`
   width: 90px;
   height: 90px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   color: white;
   display: flex;
   align-items: center;
@@ -302,8 +294,21 @@ const Avatar = styled.div`
   font-size: 2.5rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-  border: 3px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+    z-index: -1;
+  }
   
   @media (max-width: 768px) {
     width: 70px;
@@ -1299,7 +1304,7 @@ const UserDashboard = () => {
                           Progress: {course.progress}%
                         </div>
                         <div style={{width: '100%', height: '8px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden'}}>
-                          <div style={{width: `${course.progress}%`, height: '100%', background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)', borderRadius: '4px', transition: 'width 0.3s ease'}}></div>
+                          <div style={{width: `${course.progress}%`, height: '100%', background: 'linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%)', borderRadius: '4px', transition: 'width 0.3s ease'}}></div>
                         </div>
                       </div>
                     </CourseInfo>
@@ -1333,7 +1338,7 @@ const UserDashboard = () => {
                           Progress: {lab.progress}%
                         </div>
                         <div style={{width: '100%', height: '8px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden'}}>
-                          <div style={{width: `${lab.progress}%`, height: '100%', background: 'linear-gradient(90deg, #f093fb 0%, #764ba2 100%)', borderRadius: '4px', transition: 'width 0.3s ease'}}></div>
+                          <div style={{width: `${lab.progress}%`, height: '100%', background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)', borderRadius: '4px', transition: 'width 0.3s ease'}}></div>
                         </div>
                       </div>
                     </CourseInfo>
@@ -1398,6 +1403,7 @@ const UserDashboard = () => {
         </WelcomeBanner>
         {renderContent()}
       </ContentWrapper>
+      <Chatbot />
     </PageContainer>
   );
 };

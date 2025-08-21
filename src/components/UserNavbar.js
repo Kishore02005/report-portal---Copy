@@ -346,6 +346,7 @@ const UserNavbar = () => {
               <NavLink to="/achievement" className={isActive('/achievement') ? 'active' : ''}>Achievements</NavLink>
               <NavLink to="/courses-user" className={isActive('/courses-user') ? 'active' : ''}>Courses</NavLink>
               <NavLink to="/hilabs-user" className={isActive('/hilabs-user') ? 'active' : ''}>Labs</NavLink>
+              <NavLink to="/contact" className={isActive('/contact') ? 'active' : ''}>Contact</NavLink>
               <ProfileSection>
                 <LogoutButton onClick={handleLogout}>Sign Out</LogoutButton>
               </ProfileSection>
@@ -359,6 +360,7 @@ const UserNavbar = () => {
         <NavLink to="/achievement" className={isActive('/achievement') ? 'active' : ''} onClick={() => setIsOpen(false)}>Achievements</NavLink>
         <NavLink to="/courses-user" className={isActive('/courses-user') ? 'active' : ''} onClick={() => setIsOpen(false)}>Courses</NavLink>
         <NavLink to="/hilabs-user" className={isActive('/hilabs-user') ? 'active' : ''} onClick={() => setIsOpen(false)}>Labs</NavLink>
+        <NavLink to="/contact" className={isActive('/contact') ? 'active' : ''} onClick={() => setIsOpen(false)}>Contact</NavLink>
         <ProfileSection>
           <LogoutButton onClick={handleLogout}>Sign Out</LogoutButton>
         </ProfileSection>

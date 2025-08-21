@@ -6,6 +6,7 @@ import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 import Loader from "../components/Loader";
 import UserNavbar from "../components/UserNavbar";
+import Chatbot from "../components/Chatbot";
 import { FiBook, FiClock, FiTag, FiCheckCircle, FiXCircle, FiTrendingUp, FiAward } from 'react-icons/fi';
 
 const fadeIn = keyframes`
@@ -20,17 +21,16 @@ const slideIn = keyframes`
 
 const PageContainer = styled.div`
   min-height: 100vh;
-  width: 100%;
-  max-width: 100vw;
-  background: 
-    linear-gradient(135deg, rgba(79, 172, 254, 0.85) 0%, rgba(0, 242, 254, 0.85) 50%, rgba(67, 233, 123, 0.85) 100%),
-    url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
+  width: 100vw;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   overflow-x: hidden;
+  overflow-y: auto;
   margin: 0;
   padding: 0;
   color: #1e293b;
@@ -42,8 +42,10 @@ const PageContainer = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
+    background: 
+      radial-gradient(circle at 20% 20%, rgba(79, 172, 254, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(67, 233, 123, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 60%, rgba(0, 242, 254, 0.05) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
   }
@@ -61,6 +63,7 @@ const ContentWrapper = styled.div`
   animation: ${fadeIn} 0.8s ease-out;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  box-sizing: border-box;
   
   @media (max-width: 1024px) {
     max-width: 100%;
@@ -152,17 +155,44 @@ const StatsBar = styled.div`
 `;
 
 const StatItem = styled.div`
-  background: rgba(255, 255, 255, 0.9);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 16px;
   padding: 1rem 1.5rem;
   text-align: center;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #4facfe, #00f2fe);
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(45deg, rgba(79, 172, 254, 0.1), rgba(0, 242, 254, 0.1));
+    border-radius: 50%;
+  }
   
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    
+    &::after {
+      background: linear-gradient(45deg, rgba(79, 172, 254, 0.2), rgba(0, 242, 254, 0.2));
+    }
   }
   
   h3 {
@@ -171,6 +201,8 @@ const StatItem = styled.div`
     margin: 0;
     color: #4facfe;
     font-family: 'Inter', sans-serif;
+    z-index: 1;
+    position: relative;
   }
   
   p {
@@ -211,11 +243,11 @@ const CourseGrid = styled.div`
 `;
 
 const CourseCard = styled.div`
-  background: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
   backdrop-filter: blur(20px);
   border-radius: 20px;
   padding: 1.75rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   flex-direction: column;
@@ -232,28 +264,29 @@ const CourseCard = styled.div`
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #4facfe, #00f2fe, #43e97b);
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #4facfe 0%, #00f2fe 50%, #43e97b 100%);
   }
   
   &::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    transition: left 0.6s ease;
+    bottom: -20px;
+    right: -20px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(45deg, rgba(79, 172, 254, 0.05), rgba(67, 233, 123, 0.05));
+    border-radius: 50%;
+    z-index: 0;
   }
   
   &:hover {
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
     
     &::after {
-      left: 100%;
+      background: linear-gradient(45deg, rgba(79, 172, 254, 0.1), rgba(67, 233, 123, 0.1));
     }
   }
   
@@ -291,6 +324,20 @@ const CourseIcon = styled.div`
   color: white;
   font-size: 1.25rem;
   flex-shrink: 0;
+  position: relative;
+  box-shadow: 0 8px 20px rgba(79, 172, 254, 0.25);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 14px;
+    background: linear-gradient(45deg, rgba(79, 172, 254, 0.2), rgba(0, 242, 254, 0.2));
+    z-index: -1;
+  }
 `;
 
 const CourseName = styled.h3`
@@ -637,6 +684,7 @@ const UserCoursesPage = () => {
           </EmptyState>
         )}
       </ContentWrapper>
+      <Chatbot />
     </PageContainer>
   );
 };

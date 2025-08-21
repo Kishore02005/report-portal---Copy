@@ -7,8 +7,11 @@ import Loader from "./components/Loader";
 
 const AppContainer = styled.div`
   font-family: "Poppins", sans-serif;
-  background-color: #f7f9fb;
   min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
 `;
 
 function App() {

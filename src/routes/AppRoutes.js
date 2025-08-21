@@ -21,6 +21,7 @@ import ReportsPage from "../pages/ReportsPage";
 // New placeholder pages for user-specific courses/labs
 import UserCoursesPage from "../pages/UserCoursesPage";
 import UserHiLabsPage from "../pages/UserHiLabsPage";
+import ContactUsPage from "../pages/ContactUsPage";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 import UnauthorizedAccess from "../components/UnauthorizedAccess";
@@ -42,6 +43,7 @@ const AppRoutes = () => {
       <Route path="/achievement" element={<ProtectedRoute allowedRoles={["user", "superadmin"]}><AchievementPage /></ProtectedRoute>} />
       <Route path="/courses-user" element={<ProtectedRoute allowedRoles={["user", "superadmin"]}><UserCoursesPage /></ProtectedRoute>} />
       <Route path="/hilabs-user" element={<ProtectedRoute allowedRoles={["user", "superadmin"]}><UserHiLabsPage /></ProtectedRoute>} />
+      <Route path="/contact" element={<ProtectedRoute allowedRoles={["user", "superadmin"]}><ContactUsPage /></ProtectedRoute>} />
 
       {/* Admin Routes */}
       <Route path="/admin/:organizationId" element={<ProtectedRoute allowedRoles={["admin", "superadmin"]}><AdminDashboard /></ProtectedRoute>} />

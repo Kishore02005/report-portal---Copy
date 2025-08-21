@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { useParams, useNavigate } from "react-router-dom";
 import UserNavbar from "../components/UserNavbar";
 import AdminSidebar from "../components/AdminSidebar";
+import Chatbot from "../components/Chatbot";
 import { FiAward, FiArrowLeft, FiDownload, FiExternalLink, FiAlertCircle } from 'react-icons/fi';
 
 /* -------------------- ANIMATIONS -------------------- */
@@ -22,13 +23,17 @@ const shimmer = keyframes`
 /* -------------------- STYLED COMPONENTS -------------------- */
 const PageContainer = styled.div`
   min-height: 100vh;
-  width: 100%;
-  max-width: 100vw;
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+  width: 100vw;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
   display: flex;
   margin-left: ${props => props.isAdminView ? '250px' : '0'};
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   overflow-x: hidden;
+  overflow-y: auto;
   margin: 0;
   padding: 0;
   
@@ -39,8 +44,10 @@ const PageContainer = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
+    background: 
+      radial-gradient(circle at 20% 20%, rgba(240, 147, 251, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(245, 87, 108, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 60%, rgba(79, 172, 254, 0.05) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
   }
@@ -63,6 +70,7 @@ const ContentWrapper = styled.div`
   min-height: 100vh;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  box-sizing: border-box;
   
   @media (max-width: 1024px) {
     padding: 0 1.5rem 2.5rem 1.5rem;
@@ -203,10 +211,10 @@ const CertificateGrid = styled.div`
 
 
 const CertificateCard = styled.div`
-  background: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
   backdrop-filter: blur(20px);
   border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   flex-direction: column;
@@ -220,19 +228,30 @@ const CertificateCard = styled.div`
     content: '';
     position: absolute;
     top: 0;
-    left: -100%;
-    width: 100%;
+    left: 0;
+    width: 4px;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    transition: left 0.6s ease;
+    background: linear-gradient(180deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    right: -15px;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(45deg, rgba(240, 147, 251, 0.05), rgba(245, 87, 108, 0.05));
+    border-radius: 50%;
+    z-index: 0;
   }
   
   &:hover {
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
     
-    &::before {
-      left: 100%;
+    &::after {
+      background: linear-gradient(45deg, rgba(240, 147, 251, 0.1), rgba(245, 87, 108, 0.1));
     }
   }
   
@@ -375,7 +394,7 @@ const DownloadButton = styled.a`
 const EmptyState = styled.div`
   margin-top: 2rem;
   padding: 3rem 2rem;
-  background: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
   backdrop-filter: blur(20px);
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -392,24 +411,42 @@ const EmptyState = styled.div`
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #f093fb, #f5576c, #4facfe);
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(45deg, rgba(240, 147, 251, 0.05), rgba(245, 87, 108, 0.05));
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    z-index: 0;
   }
 
   svg {
     font-size: 3rem;
     color: #f093fb;
+    z-index: 1;
+    position: relative;
   }
   h3 {
     font-size: 1.25rem;
     color: #1e293b;
     margin: 0;
+    z-index: 1;
+    position: relative;
   }
   p {
     color: #475569;
     max-width: 400px;
     margin: 0;
+    z-index: 1;
+    position: relative;
   }
 `;
 
@@ -584,6 +621,7 @@ const AchievementPage = () => {
         </Header>
         {renderContent()}
       </ContentWrapper>
+      {!isAdminView && <Chatbot />}
     </PageContainer>
   );
 };
